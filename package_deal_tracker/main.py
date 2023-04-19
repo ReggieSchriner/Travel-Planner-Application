@@ -5,7 +5,7 @@ from kivy.modules import inspector  # For inspection.
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.spinner import Spinner
 from deals import DealsDatabase, Forecasts, Venues, Operators
-import tracker_installer
+import installer
 import mysql.connector
 
 
@@ -21,7 +21,7 @@ class ScreenTwo(Screen):
             self.ids.message.text = 'Invalid input'
         else:
             self.ids.message.text = 'Success!'
-            addition = tracker_installer.Venues(name=attributes[0], latitude=attributes[1], longitude=attributes[2],
+            addition = installer.Venues(name=attributes[0], latitude=attributes[1], longitude=attributes[2],
                                                 type=attributes[3])
             app = App.get_running_app()
             app.commit(addition)
@@ -35,7 +35,7 @@ class ScreenThree(Screen):
             self.ids.message.text = 'Invalid input'
         else:
             self.ids.message.text = 'Success!'
-            addition = tracker_installer.Operators(name=attributes[0], rate_my_pilot_score=attributes[1])
+            addition = installer.Operators(name=attributes[0], rate_my_pilot_score=attributes[1])
             app = App.get_running_app()
             app.commit(addition)
         self.ids.name.text, self.ids.score.text = '', ''
