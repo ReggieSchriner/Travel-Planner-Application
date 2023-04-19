@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+*.pyo
+*.json
+
+.idea/
+bin/
+venv/
+*.iml
+*.iws
+*.ipr
