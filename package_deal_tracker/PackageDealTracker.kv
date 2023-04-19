@@ -1,0 +1,141 @@
+WindowManager:
+    ScreenOne:
+        name: 'main_menu'
+    ScreenTwo:
+        name: 'new_venue'
+    ScreenThree:
+        name: 'add/edit_operator'
+    ScreenFour:
+        name: 'edit_operator'
+    ScreenFive:
+        name: 'check_forecast'
+
+<ScreenOne>:
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: 'Package Deal Tracker'
+        Button:
+            text: 'New Venue'
+            on_release:
+                app.root.current = 'new_venue'
+        Button:
+            text: 'Add/Edit Operator'
+            on_release:
+                app.root.current = 'add/edit_operator'
+        Button:
+            text: 'Check Forecast'
+            on_release:
+                app.root.current = 'check_forecast'
+
+<ScreenTwo>:
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: 'New Venue'
+        Label:
+            text: 'Name'
+        TextInput:
+            id: name
+        Label:
+            text: 'Longitude'
+        TextInput:
+            id: longitude
+            input_filter: 'float'
+        Label:
+            text: 'Latitude'
+        TextInput:
+            id: latitude
+            input_filter: 'float'
+        Label:
+            text: 'Type'
+        TextInput:
+            id: type
+        Button:
+            text: 'Submit'
+            on_press: root.add_venue()
+        Label:
+            text: ''
+            id: message
+        Button:
+            text: 'Back'
+            on_release:
+                app.root.current = 'main_menu'
+
+<ScreenThree>:
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: 'Add/Edit Operator'
+        Label:
+            text: 'Name'
+        TextInput:
+            id: name
+        Label:
+            text: 'Score'
+        TextInput:
+            id: score
+            input_filter: 'float'
+        Button:
+            text: 'Add'
+            on_press: root.add_operator()
+        Label:
+            id: message
+        Button:
+            text: 'Edit Operator'
+            on_release:
+                app.root.current = 'edit_operator'
+        Button:
+            text: 'Back'
+            on_release:
+                app.root.current = 'main_menu'
+
+<ScreenFour>:
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: 'Edit Operator'
+        Label:
+            text: 'New name'
+        TextInput:
+            id: new_name
+        Label:
+            text: 'Score'
+        TextInput:
+            id: score
+        Label:
+            text: '(select operator last)'
+        BoxLayout:
+            id: operators
+        Label:
+            id: message
+        Button:
+            text: 'Back'
+            on_release:
+                app.root.current = 'add/edit_operator'
+
+<ScreenFive>:
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: 'Check Forecast'
+        Label:
+            text: 'Date'
+        BoxLayout:
+            id: date
+        Label:
+            text: 'Venue'
+        BoxLayout:
+            id: venues
+        Label:
+            text: 'Forecast'
+        Label:
+            id: forecast
+            text:
+        Label:
+            id: message
+        Button:
+            text: 'Back'
+            on_release:
+                app.root.current = 'main_menu'
+
