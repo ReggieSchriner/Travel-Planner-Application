@@ -21,6 +21,7 @@ class Venues(Persisted):
     latitude = Column(Float, nullable=False)
     longitude = Column(Float, nullable=False)
     type = Column(String(256), nullable=False)
+    score = Column(Integer, nullable=False)
     deals = relationship("Deals", back_populates="venue")
     forecasts = relationship("Forecasts", back_populates="venue")
 
@@ -45,6 +46,15 @@ class Forecasts(Persisted):
     precipitation = Column(Float, nullable=False)
     venue = relationship("Venues", back_populates="forecasts")
 
+class OperatorScores(Persisted):
+    __tablename__ = 'OperatorScores'
+    score_id = Column(Integer, primary_key=True)
+    operator_id = Column(Integer, ForeignKey('Operators.operator_id'))
+
+class VenueScore(Persisted):
+    __tablename__ = 'VenueScores'
+    score_id = Column(Integer, primary_key=True)
+    venue_id = Column(Integer, ForeignKey('Venues.venue_id'))
 
 class DealsDatabase(object):
     @staticmethod
