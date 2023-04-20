@@ -1,0 +1,369 @@
+#:import SlideTransition kivy.uix.screenmanager.SlideTransition
+#:import Factory kivy.factory.Factory
+WindowManager:
+    transition: SlideTransition(direction='right' if app.advancing else 'left')
+    HomeScreen:
+        name: 'home'
+    VenueScreen:
+        name: 'venue'
+    CityScreen:
+        name: 'city'
+    WeatherScreen:
+        name: 'weather'
+
+<HomeScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        BoxLayout:
+            orientation: 'horizontal'
+            Widget:
+                size_hint: (.15, 1)
+            Label:
+                text: 'Entertainment Tracker'
+                font_size: sp(27)
+            Widget:
+                size_hint: (.15, 1)
+        Widget:
+        BoxLayout:
+            orientation: 'horizontal'
+            Widget:
+                size_hint: (.15, 1)
+            Button:
+                text: 'New City'
+                on_press:
+                    app.advancing = False
+                    app.root.current = 'city'
+            Widget:
+                size_hint: (.15, 1)
+        Widget:
+            size_hint: (1, .15)
+        BoxLayout:
+            orientation: 'horizontal'
+            Widget:
+                size_hint: (.15, 1)
+            Button:
+                text: 'Add/Edit Venue'
+                on_press:
+                    app.advancing = False
+                    app.root.current = 'venue'
+            Widget:
+                size_hint: (.15, 1)
+        Widget:
+
+<VenueScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        BoxLayout:
+            orientation: 'horizontal'
+            Widget:
+                size_hint: (.15, 1)
+            Label:
+                text: 'Add/Edit Venue'
+                font_size: sp(27)
+            Widget:
+                size_hint: (.15, 1)
+        BoxLayout:
+            orientation: 'vertical'
+            Label:
+                text: 'Venue Name'
+            BoxLayout:
+                orientation: 'horizontal'
+                Widget:
+                    size_hint: (.15, 1)
+                TextInput:
+                    id: venue_name
+                    multiline: False
+                    write_tab: False
+                    halign: 'center'
+                Widget:
+                    size_hint: (.15, 1)
+        Widget:
+            size_hint: (1, .1)
+        BoxLayout:
+            orientation: 'vertical'
+            Label:
+                text: 'City'
+            BoxLayout:
+                orientation: 'horizontal'
+                Widget:
+                    size_hint: (.15, 1)
+                TextInput:
+                    id: city
+                    multiline: False
+                    write_tab: False
+                    halign: 'center'
+                Widget:
+                    size_hint: (.15, 1)
+        Widget:
+            size_hint: (1, .1)
+        BoxLayout:
+            orientation: 'vertical'
+            Label:
+                text: 'Venue Type'
+            BoxLayout:
+                orientation: 'horizontal'
+                Widget:
+                    size_hint: (.15, 1)
+                Spinner:
+                    id: type
+                    text: 'Indoor Restaurant'
+                    values: 'Indoor Restaurant', 'Outdoor Restaurant', 'Indoor Sports Arena', 'Outdoor Sports Arena', 'Indoor Theater', 'Outdoor Theater'
+                Widget:
+                    size_hint: (.15, 1)
+        Widget:
+            size_hint: (1, .2)
+        BoxLayout:
+            Widget:
+                size_hint: (.15, 1)
+            Button:
+                text: 'Weather Conditions...'
+                on_press:
+                    root.save_venue_inputs()
+                    app.advancing = False
+                    app.root.current = 'weather'
+            Widget:
+                size_hint: (.15, 1)
+        Widget:
+            size_hint: (1, .1)
+        Button:
+            text: 'Exit'
+            on_press:
+                app.advancing = True
+                app.root.current = 'home'
+
+<WeatherScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        BoxLayout:
+            size_hint: (1, .2)
+            orientation: 'vertical'
+            Label:
+                text: 'Select weather conditions in which the venue'
+            Label:
+                text: 'will not function'
+        Widget:
+            size_hint: (1, .15)
+        BoxLayout:
+            size_hint: (1, .2)
+            orientation: 'horizontal'
+            ToggleButton:
+                id: thunderstorm
+                text: 'Thunderstorm'
+            ToggleButton:
+                id: drizzle
+                text: 'Drizzle'
+            ToggleButton:
+                id: rain
+                text: 'Rain'
+            ToggleButton:
+                id: snow
+                text: 'Snow'
+        Widget:
+            size_hint: (1, .15)
+        BoxLayout:
+            size_hint: (1, .2)
+            orientation: 'horizontal'
+            Widget:
+                size_hint: (.15, 1)
+            ToggleButton:
+                id: atmosphere
+                text: 'Atmosphere'
+            ToggleButton:
+                id: clear_weather
+                text: 'Clear'
+            ToggleButton:
+                id: clouds
+                text: 'Clouds'
+            Widget:
+                size_hint: (.15, 1)
+        Label:
+            size_hint: (1, .15)
+            text: 'Leave empty to not include'
+        BoxLayout:
+            orientation: 'horizontal'
+            Widget:
+                size_hint: (.25, 1)
+            BoxLayout:
+                orientation: 'vertical'
+                BoxLayout:
+                    orientation: 'horizontal'
+                    Label:
+                        text: 'Temperature'
+                    Spinner:
+                        id: temp_bound
+                        text: 'above'
+                        values: 'above', 'below'
+                    TextInput:
+                        id: temp
+                        multiline: False
+                        write_tab: False
+                        input_filter: 'float'
+                        halign: 'center'
+                BoxLayout:
+                    orientation: 'horizontal'
+                    Label:
+                        text: 'Humidity below '
+                    Spinner:
+                        id: humidity_bound
+                        text: 'above'
+                        values: 'above', 'below'
+                    TextInput:
+                        id: humidity
+                        multiline: False
+                        write_tab: False
+                        input_filter: 'float'
+                        halign: 'center'
+                BoxLayout:
+                    orientation: 'horizontal'
+                    Label:
+                        text: 'Wind Speed above '
+                    TextInput:
+                        id: wind_speed
+                        multiline: False
+                        write_tab: False
+                        input_filter: 'float'
+                        halign: 'center'
+            Widget:
+                size_hint: (.25, 1)
+        Widget:
+            size_hint: (1, .1)
+        BoxLayout:
+            size_hint: (1, .2)
+            orientation: 'horizontal'
+            Button:
+                text: 'Back'
+                on_press:
+                    app.advancing = True
+                    app.root.current = 'venue'
+            Widget:
+                size_hint: (.1, 1)
+            Button:
+                text: 'Submit!'
+                on_press:
+                    root.save_weather_inputs()
+                    Factory.MyPopup().open()
+<MyPopup@Popup>
+    title: 'Success!'
+    size_hint: (.8, .3)
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: 'Data successfully saved'
+        BoxLayout:
+            Button:
+                text: 'Return to home'
+                on_press:
+                    root.dismiss()
+                    app.advancing = True
+                    app.root.current = 'home'
+
+<CityScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        BoxLayout:
+            orientation: 'horizontal'
+            Widget:
+                size_hint: (.15, 1)
+            Label:
+                text: 'New City'
+                font_size: sp(27)
+            Widget:
+                size_hint: (.15, 1)
+        BoxLayout:
+            orientation: 'vertical'
+            Label:
+                text: 'City Name'
+            BoxLayout:
+                orientation: 'horizontal'
+                Widget:
+                    size_hint: (.15, 1)
+                TextInput:
+                    id: name
+                    multiline: False
+                    write_tab: False
+                    halign: 'center'
+                Widget:
+                    size_hint: (.15, 1)
+        Widget:
+            size_hint: (1, .1)
+        BoxLayout:
+            orientation: 'vertical'
+            Label:
+                text: 'Country'
+            BoxLayout:
+                orientation: 'horizontal'
+                Widget:
+                    size_hint: (.15, 1)
+                TextInput:
+                    id: country
+                    multiline: False
+                    write_tab: False
+                    halign: 'center'
+                Widget:
+                    size_hint: (.15, 1)
+        Widget:
+            size_hint: (1, .1)
+        BoxLayout:
+            orientation: 'vertical'
+            Label:
+                text: 'Latitude & Longitude'
+            BoxLayout:
+                orientation: 'horizontal'
+                Widget:
+                    size_hint: (.15, 1)
+                TextInput:
+                    id: lat
+                    multiline: False
+                    write_tab: False
+                    input_filter: 'float'
+                    halign: 'center'
+                Widget:
+                    size_hint: (.1, 1)
+                TextInput:
+                    id: long
+                    multiline: False
+                    write_tab: False
+                    input_filter: 'float'
+                    halign: 'center'
+                Widget:
+                    size_hint: (.15, 1)
+        Widget:
+            size_hint: (1, .2)
+        BoxLayout:
+            Widget:
+                size_hint: (.15, 1)
+            Button:
+                text: 'Submit!'
+                on_press:
+                    root.save_city_inputs()
+                    Factory.MyPopup2().open()
+            Widget:
+                size_hint: (.15, 1)
+        Widget:
+            size_hint: (1, .1)
+        Button:
+            text: 'Exit'
+            on_press:
+                app.advancing = True
+                app.root.current = 'home'
+
+<MyPopup2@Popup>
+    title: 'Success!'
+    size_hint: (.8, .3)
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: 'Would you like to add a venue to this city?'
+        BoxLayout:
+            Button:
+                text: 'Yes'
+                on_press:
+                    root.dismiss()
+                    app.advancing = False
+                    app.root.current = 'venue'
+            Button:
+                text: 'No'
+                on_press:
+                    root.dismiss()
+                    app.advancing = True
+                    app.root.current = 'home'
