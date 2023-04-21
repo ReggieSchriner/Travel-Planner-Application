@@ -1,16 +1,18 @@
 WindowManager:
-    ScreenOne:
+    MainMenu:
         name: 'main_menu'
-    ScreenTwo:
+    NewVenue:
         name: 'new_venue'
-    ScreenThree:
+    AddEditOperator:
         name: 'add/edit_operator'
-    ScreenFour:
+    EditOperator:
         name: 'edit_operator'
-    ScreenFive:
+    CheckForecast:
         name: 'check_forecast'
+    SubmitReview:
+        name: 'submit_review'
 
-<ScreenOne>:
+<MainMenu>:
     BoxLayout:
         orientation: 'vertical'
         Label:
@@ -27,8 +29,12 @@ WindowManager:
             text: 'Check Forecast'
             on_release:
                 app.root.current = 'check_forecast'
+        Button:
+            text: 'Submit Review'
+            on_release:
+                app.root.current = 'submit_review'
 
-<ScreenTwo>:
+<NewVenue>:
     BoxLayout:
         orientation: 'vertical'
         Label:
@@ -62,7 +68,7 @@ WindowManager:
             on_release:
                 app.root.current = 'main_menu'
 
-<ScreenThree>:
+<AddEditOperator>:
     BoxLayout:
         orientation: 'vertical'
         Label:
@@ -90,7 +96,7 @@ WindowManager:
             on_release:
                 app.root.current = 'main_menu'
 
-<ScreenFour>:
+<EditOperator>:
     BoxLayout:
         orientation: 'vertical'
         Label:
@@ -114,7 +120,7 @@ WindowManager:
             on_release:
                 app.root.current = 'add/edit_operator'
 
-<ScreenFive>:
+<CheckForecast>:
     BoxLayout:
         orientation: 'vertical'
         Label:
@@ -133,6 +139,42 @@ WindowManager:
             id: forecast
             text:
         Label:
+            id: message
+        Button:
+            text: 'Back'
+            on_release:
+                app.root.current = 'main_menu'
+
+<SubmitReview>
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: 'Submit Review'
+        Label:
+            text: 'Venue'
+        Label:
+            text: 'Score'
+        TextInput:
+            id: venue_score
+            input_filter: 'int'
+        BoxLayout:
+            orientation: 'vertical'
+            id: venues
+        Label:
+            text: 'Operator'
+        Label:
+            text: 'Score'
+        TextInput:
+            id: operator_score
+            input_filter: 'int'
+        BoxLayout:
+            orientation: 'vertical'
+            id: operators
+        Button:
+            text: 'Submit'
+            on_press: root.submit_scores()
+        Label:
+            text: ''
             id: message
         Button:
             text: 'Back'

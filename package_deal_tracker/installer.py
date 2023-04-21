@@ -3,14 +3,14 @@ from sys import stderr
 
 from sqlalchemy.exc import SQLAlchemyError
 
-from deals import Venues, DealsDatabase, Operators, Deals, Forecasts
+from deals import Venues, DealsDatabase, Operators, Deals, Forecasts, VenueScores, OperatorScores
 
 
 def add_starter_data(session):
     # create venues
-    olive_garden = Venues(name='Olive Garden', latitude=1, longitude=1, type='Restaurant')
-    marcus_grand_cinema = Venues(name='Marcus Grand Cinema', latitude=1, longitude=1, type='Theater')
-    pinnacle_bank_arena = Venues(name='Pinnacle Bank Arena', latitude=1, longitude=1, type='Sports Arena')
+    olive_garden = Venues(name='Olive Garden', latitude=1, longitude=1, type='Restaurant', score=10)
+    marcus_grand_cinema = Venues(name='Marcus Grand Cinema', latitude=1, longitude=1, type='Theater', score=8)
+    pinnacle_bank_arena = Venues(name='Pinnacle Bank Arena', latitude=1, longitude=1, type='Sports Arena', score=7)
     session.add_all([olive_garden, marcus_grand_cinema, pinnacle_bank_arena])
     session.commit()
 
@@ -36,14 +36,27 @@ def add_starter_data(session):
     olive_garden_deal = Deals(venue=olive_garden, operator=operator_1)
     marcus_grand_cinema_deal = Deals(venue=marcus_grand_cinema, operator=operator_1)
     pinnacle_bank_arena_deal = Deals(venue=pinnacle_bank_arena, operator=operator_2)
-    olive_garden_deal2 = Deals(venue=olive_garden, operator= operator_2)
+    olive_garden_deal2 = Deals(venue=olive_garden, operator=operator_2)
     session.add_all([olive_garden_deal, marcus_grand_cinema_deal, pinnacle_bank_arena_deal, olive_garden_deal2])
+    session.commit()
+
+    # create venue scores
+    olive_garden_score = VenueScores(venue_id=1, score=1)
+    marcus_grand_cinema_score = VenueScores(venue_id=2, score=2)
+    pinnacle_bank_arena_score = VenueScores(venue_id=3, score=3)
+    session.add_all([olive_garden_score, marcus_grand_cinema_score, pinnacle_bank_arena_score])
+    session.commit()
+
+    # create operator scores
+    operator_1_score = OperatorScores(score=1, score_id=1, operator_id=1)
+    operator_2_score = OperatorScores(score=2, score_id=2, operator_id=2)
+    session.add_all([operator_1_score, operator_2_score])
     session.commit()
 
 
 def main():
     try:
-        url = DealsDatabase.construct_mysql_url('localhost', 3306, 'deals_d', 'root', 'cse1208')
+        url = DealsDatabase.construct_mysql_url('localhost', 3306, 'package_deals', 'root', 'cse1208')
         package_deal_database = DealsDatabase(url)
         package_deal_database.ensure_tables_exist()
         print('Tables created.')
