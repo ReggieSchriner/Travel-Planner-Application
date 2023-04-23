@@ -4,35 +4,45 @@ from kivy.lang import Builder
 from kivy.modules import inspector  # For inspection.
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.spinner import Spinner
-from deals import DealsDatabase, Forecasts, Venues, Operators
+from deals import DealsDatabase, Forecasts, Venues, Operators, VenueScores, OperatorScores
 import installer
 import mysql.connector
 
 
-class ScreenOne(Screen):
+class MainMenu(Screen):
     pass
 
 
-class ScreenTwo(Screen):
+class NewVenue(Screen):
     def add_venue(self):
+        app = App.get_running_app()
         attributes = [self.ids.name.text, self.ids.latitude.text, self.ids.longitude.text, self.ids.type.text]
-        if any(attribute.isspace() or attribute == '' for attribute in attributes) or (
-                -90 > int(attributes[1]) < 90) or (-180 > int(attributes[2]) < 180):
-            self.ids.message.text = 'Invalid input'
+        existing_venue = app.session.query(Venues).filter_by(name=attributes[0]).first()
+        if any(attribute.isspace() or attribute == '' for attribute in attributes):
+            self.ids.message.text = 'Fill in all text boxes'
+            self.ids.name.text, self.ids.latitude.text, self.ids.longitude.text, self.ids.type.text = '', '', '', ''
+        elif (-90 > float(attributes[1]) < 90) or (-180 > float(attributes[2]) < 180):
+            self.ids.message.text = 'Invalid longitude or latitude'
+            self.ids.name.text, self.ids.latitude.text, self.ids.longitude.text, self.ids.type.text = '', '', '', ''
+        elif existing_venue:
+            self.ids.message.text = 'The given venue already exists'
+            self.ids.name.text, self.ids.latitude.text, self.ids.longitude.text, self.ids.type.text = '', '', '', ''
         else:
             self.ids.message.text = 'Success!'
             addition = installer.Venues(name=attributes[0], latitude=attributes[1], longitude=attributes[2],
-                                                type=attributes[3])
+                                        type=attributes[3])
             app = App.get_running_app()
             app.commit(addition)
         self.ids.name.text, self.ids.latitude.text, self.ids.longitude.text, self.ids.type.text = '', '', '', ''
 
 
-class ScreenThree(Screen):
+class AddEditOperator(Screen):
     def add_operator(self):
         attributes = [self.ids.name.text, self.ids.score.text]
+
         if any(attribute.isspace() or attribute == '' for attribute in attributes):
-            self.ids.message.text = 'Invalid input'
+            self.ids.message.text = 'Fill in all text boxes'
+            self.ids.new_name.text, self.ids.score.text = '', ''
         else:
             self.ids.message.text = 'Success!'
             addition = installer.Operators(name=attributes[0], rate_my_pilot_score=attributes[1])
@@ -41,7 +51,7 @@ class ScreenThree(Screen):
         self.ids.name.text, self.ids.score.text = '', ''
 
 
-class ScreenFour(Screen):
+class EditOperator(Screen):
     def on_enter(self):
         self.ids.operators.clear_widgets()
         spinner = Spinner(text='Select an operator', values=[])
@@ -59,8 +69,12 @@ class ScreenFour(Screen):
 
         existing_operator = app.session.query(Operators).filter_by(name=attributes[0]).first()
 
-        if any(attribute.isspace() or attribute == '' for attribute in attributes) or existing_operator:
-            self.ids.message.text = 'Invalid input'
+        if any(attribute.isspace() or attribute == '' for attribute in attributes):
+            self.ids.message.text = 'Fill in all text boxes'
+            self.ids.new_name.text, self.ids.score.text = '', ''
+        if existing_operator:
+            self.ids.message.text = 'The entered operator already exists'
+            self.ids.new_name.text, self.ids.score.text = '', ''
         else:
             self.ids.message.text = 'Success!'
             selection = spinner.text
@@ -74,7 +88,7 @@ class ScreenFour(Screen):
         self.ids.new_name.text, self.ids.score.text = '', ''
 
 
-class ScreenFive(Screen):
+class CheckForecast(Screen):
     def on_enter(self):
         self.ids.venues.clear_widgets()
         venue_spinner = Spinner(text='Select a venue', values=[])
@@ -93,7 +107,8 @@ class ScreenFive(Screen):
         dates = app.get_dates()
         for date in dates:
             if date not in seen_values:
-                date_spinner.values.append(str(date).replace('(', '').replace(')', '').replace("'", '').replace(',', ''))
+                date_spinner.values.append(
+                    str(date).replace('(', '').replace(')', '').replace("'", '').replace(',', ''))
                 seen_values.add(date)
         date_spinner.bind(text=self.get_forecast)
         self.ids.date.add_widget(date_spinner)
@@ -125,6 +140,87 @@ class ScreenFive(Screen):
                     self.ids.forecast.text = 'No forecast for that day and venue.'
 
 
+class SubmitReview(Screen):
+    def on_enter(self):
+        self.ids.venues.clear_widgets()
+        venue_spinner = Spinner(text='Select a venue', values=[])
+        venue_spinner.id = 'venues'
+        app = App.get_running_app()
+        venues = app.get_venues()
+        seen_values = set()
+        for venue in venues:
+            if venue not in seen_values:
+                venue_spinner.values.append(str(venue).replace('(', '').replace(')', '').replace("'", '').replace(',', ''))
+                seen_values.add(venue)
+        self.ids.operators.clear_widgets()
+        operator_spinner = Spinner(text='Select an operator', values=[])
+        operator_spinner.id = 'operators'
+        app = App.get_running_app()
+        operators = app.get_operators()
+        for operator in operators:
+            operator_spinner.values.append(str(operator).replace('(', '').replace(')', '').replace("'", '').replace(',', ''))
+        self.ids.venues.add_widget(venue_spinner)
+        self.ids.operators.add_widget(operator_spinner)
+
+    def submit_scores(self):
+        app = App.get_running_app()
+        venue_spinner = self.ids.venues.children[0]
+        venue_selection = venue_spinner.text
+        venue_score = self.ids.venue_score.text
+        operator_spinner = self.ids.operators.children[0]
+        operator_selection = operator_spinner.text
+        operator_score = self.ids.operator_score.text
+        venue_scores_length = 0
+        operator_scores_length = 0
+        venue_score_total = 0
+        operator_score_total = 0
+
+        if venue_selection != 'Select a venue':
+            if venue_score.isspace() or venue_score == '':
+                self.ids.message.text = 'Please enter a venue score'
+            else:
+                venue = app.session.query(Venues).filter_by(name=venue_selection).first()
+                venue_id = venue.venue_id
+                score = venue_score
+                last_id = int(app.session.query(VenueScores.score_id).order_by(VenueScores.score_id.desc()).first()[0])
+                score_id = last_id + 1
+                addition = installer.VenueScores(score=score, venue_id=venue_id, score_id=score_id)
+                app.commit(addition)
+                app.session.commit()
+                self.ids.message.text = 'Success!'
+                self.ids.venue_score.text = ''
+                query = app.session.query(VenueScores.score).filter(VenueScores.venue_id == venue_id)
+                venue_scores = query.all()
+                for score, in venue_scores:
+                    venue_score_total += score
+                    venue_scores_length += 1
+                average_score = (venue_score_total//venue_scores_length)
+                venue.score = average_score
+                app.session.commit()
+
+        if operator_selection != 'Select an operator':
+            if operator_score.isspace() or operator_score == '':
+                self.ids.message.text = 'Please enter an operator score'
+            else:
+                operator = app.session.query(Operators).filter_by(name=operator_selection).first()
+                operator_id = operator.operator_id
+                score = operator_score
+                last_id = int(app.session.query(OperatorScores.score_id).order_by(OperatorScores.score_id.desc()).first()[0])
+                score_id = last_id + 1
+                addition = installer.OperatorScores(score=score, operator_id=operator_id, score_id=score_id)
+                app.commit(addition)
+                app.session.commit()
+                self.ids.message.text = 'Success!'
+                self.ids.operator_score.text = ''
+                query = app.session.query(OperatorScores.score).filter(OperatorScores.operator_id == operator_id)
+                operator_scores = query.all()
+                for score, in operator_scores:
+                    operator_score_total += score
+                    operator_scores_length += 1
+                average_score = (operator_score_total//operator_scores_length)
+                operator.rate_my_pilot_score = average_score
+                app.session.commit()
+
 class WindowManager(ScreenManager):
     pass
 
@@ -132,7 +228,7 @@ class WindowManager(ScreenManager):
 class PackageDealTracker(App):
     def __init__(self, **kwargs):
         super(PackageDealTracker, self).__init__(**kwargs)
-        url = DealsDatabase.construct_mysql_url('localhost', 3306, 'deals_d', 'root', 'cse1208')
+        url = DealsDatabase.construct_mysql_url('localhost', 3306, 'package_deals', 'root', 'cse1208')
         self.deals_database = DealsDatabase(url)
         self.session = self.deals_database.create_session()
 
@@ -157,7 +253,7 @@ class PackageDealTracker(App):
         return query
 
     def execute_query(self, query):
-        connection = mysql.connector.connect(host='localhost', port=3306, database='deals_d', user='root',
+        connection = mysql.connector.connect(host='localhost', port=3306, database='package_deals', user='root',
                                              password='cse1208')
         cursor = connection.cursor()
         cursor.execute(query)
