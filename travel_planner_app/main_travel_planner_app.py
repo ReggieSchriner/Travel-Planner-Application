@@ -18,13 +18,12 @@ class MainWindow(ScreenManager):
 class CredentialsWindow(Screen):
     pass
 
-class timer():
-    def work1(self):
-        self.work1(self).current = 'loading screen'
 
 class LoadingScreen(Screen):
-    def switchToNextScreen(self):
-        Clock.schedule_once(timer.work1, 2)
+    def on_enter(self):
+        Clock.schedule_once(self.switch_to_next_screen, 2)
+    def switch_to_next_screen(self, *args):
+        self.manager.current = 'main_menu'
 
 class MainMenu(Screen):
     pass
