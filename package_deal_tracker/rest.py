@@ -3,7 +3,6 @@ import json
 from kivy.network.urlrequest import UrlRequest
 from urllib.parse import quote
 
-
 class RESTConnection:
     def __init__(self, authority, port, root_path, username=None, password=None):
         self.authority = authority

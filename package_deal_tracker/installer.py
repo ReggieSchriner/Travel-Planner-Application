@@ -1,8 +1,6 @@
 from datetime import datetime, date, timedelta
 from sys import stderr
-
 from sqlalchemy.exc import SQLAlchemyError
-
 from deals import Venues, DealsDatabase, Operators, Deals, Forecasts, VenueScores, OperatorScores
 
 
