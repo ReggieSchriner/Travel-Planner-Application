@@ -16,7 +16,7 @@ def add_starter_data(session):
 
     # create forecasts
     today = str(datetime.today().date())
-    tomorrow = str(date.today() + timedelta(days=1))
+    tomorrow = str(datetime.today() + timedelta(days=1))
     olive_garden_forecast_1 = Forecasts(venue=olive_garden, date=today, temperature=70, humidity=50, wind_speed=10, feels_like=75, precipitation=0)
     olive_garden_forecast_2 = Forecasts(venue=olive_garden, date=tomorrow, temperature=80, humidity=60, wind_speed=5, feels_like=85, precipitation=0)
     marcus_grand_cinema_forecast_1 = Forecasts(venue=marcus_grand_cinema, date=today, temperature=72, humidity=45, wind_speed=12, feels_like=78, precipitation=0)

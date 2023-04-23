@@ -7,6 +7,15 @@ from kivy.uix.spinner import Spinner
 from deals import DealsDatabase, Forecasts, Venues, Operators, VenueScores, OperatorScores
 import installer
 import mysql.connector
+from kivy.app import App
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.label import Label
+from kivy.properties import ListProperty
+from kivy.logger import Logger
+from datetime import datetime, timedelta
+from api_key import API_KEY
+from rest import RESTConnection
+from json import dumps
 
 
 class MainMenu(Screen):
@@ -60,19 +69,19 @@ class EditOperator(Screen):
         operators = app.get_operators()
         for operator in operators:
             spinner.values.append(str(operator).replace('(', '').replace(')', '').replace("'", '').replace(',', ''))
-        spinner.bind(text=self.submit_operator)
         self.ids.operators.add_widget(spinner)
 
-    def submit_operator(self, spinner, text):
+    def submit_operator(self):
         attributes = [self.ids.new_name.text, self.ids.score.text]
         app = App.get_running_app()
+        spinner = self.ids.operators.children[0]
 
         existing_operator = app.session.query(Operators).filter_by(name=attributes[0]).first()
 
         if any(attribute.isspace() or attribute == '' for attribute in attributes):
             self.ids.message.text = 'Fill in all text boxes'
             self.ids.new_name.text, self.ids.score.text = '', ''
-        if existing_operator:
+        elif existing_operator:
             self.ids.message.text = 'The entered operator already exists'
             self.ids.new_name.text, self.ids.score.text = '', ''
         else:
@@ -100,26 +109,22 @@ class CheckForecast(Screen):
             if venue not in seen_values:
                 venue_spinner.values.append(str(venue).replace('(', '').replace(')', '').replace("'", '').replace(',', ''))
                 seen_values.add(venue)
-        venue_spinner.bind(text=self.get_forecast)
         self.ids.date.clear_widgets()
         date_spinner = Spinner(text='Select a date', values=[])
         date_spinner.id = 'dates'
-        dates = app.get_dates()
+        today = datetime.today().date()
+        dates = [today + timedelta(days=i) for i in range(5)]
         for date in dates:
-            if date not in seen_values:
-                date_spinner.values.append(
-                    str(date).replace('(', '').replace(')', '').replace("'", '').replace(',', ''))
-                seen_values.add(date)
-        date_spinner.bind(text=self.get_forecast)
+            date_spinner.values.append(str(date).replace('(', '').replace(')', '').replace("'", '').replace(',', ''))
         self.ids.date.add_widget(date_spinner)
         self.ids.venues.add_widget(venue_spinner)
 
-    def get_forecast(self, instance, value):
+    def get_forecast(self):
         app = App.get_running_app()
         venue_spinner = self.ids.venues.children[0]
         date_spinner = self.ids.date.children[0]
         venue = venue_spinner.text
-        date = date_spinner.text
+        date = str(date_spinner.text)
         query = f"SELECT venue_id FROM Venues WHERE name='{venue}'"
         result = app.execute_query(query)
         if result:
@@ -262,10 +267,61 @@ class PackageDealTracker(App):
         connection.close()
         return result
 
+    records = ListProperty([])
+
+    def load_records(self):
+        self.records = []
+        connection = RESTConnection('api.openweathermap.org', 443, '/data/2.5')
+        connection.send_request(
+            'forecast',
+            {
+                'appid': API_KEY,
+                'lat': UNL_LATITUDE,
+                'lon': UNL_LONGITUDE,
+                'units': UNITS,
+            },
+            None,
+            self.on_records_loaded,
+            self.on_records_not_loaded,
+            self.on_records_not_loaded
+        )
+
+    def on_records_loaded(self, _, response):
+        print(dumps(response, indent=4, sort_keys=True))
+        self.records = [format_forecast_record(response)]
+
+    def on_records_not_loaded(self, _, error):
+        self.records = ['[Failed to load records]']
+        Logger.error(f'{self.__class__.__name__}: {error}')
+
+    def to_human_readable_time(timestamp):
+        return datetime.fromtimestamp(timestamp).strftime('%A %I:%M %p')
+
     def build(self):
         inspector.create_inspector(Window, self)
         kv = Builder.load_file('PackageDealTracker.kv')
         return kv
+
+UNL_LATITUDE = 40.8207
+UNL_LONGITUDE = -96.7005
+UNITS = 'imperial'
+
+
+class Record(Label):
+    pass
+
+
+class Records(BoxLayout):
+    records = ListProperty([])
+
+    def rebuild(self):
+        self.clear_widgets()
+        for record in self.records:
+            self.add_widget(Record(text=record))
+
+    def on_records(self, _, __):
+        self.rebuild()
+
 
 
 if __name__ == "__main__":

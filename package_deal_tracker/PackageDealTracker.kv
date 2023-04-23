@@ -109,10 +109,11 @@ WindowManager:
             text: 'Score'
         TextInput:
             id: score
-        Label:
-            text: '(select operator last)'
         BoxLayout:
             id: operators
+        Button:
+            text: 'Submit'
+            on_press: root.submit_operator()
         Label:
             id: message
         Button:
@@ -140,6 +141,9 @@ WindowManager:
             text:
         Label:
             id: message
+        Button:
+            text: 'Submit'
+            on_press: root.get_forecast()
         Button:
             text: 'Back'
             on_release:
