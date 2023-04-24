@@ -95,6 +95,7 @@ class EditOperator(Screen):
 
 class CheckForecast(Screen):
     def on_enter(self):
+        self.ids.forecast.text = ''
         self.ids.venues.clear_widgets()
         venue_spinner = Spinner(text='Select a venue', values=[])
         venue_spinner.id = 'venues'
