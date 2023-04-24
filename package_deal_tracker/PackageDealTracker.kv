@@ -12,6 +12,7 @@ WindowManager:
     SubmitReview:
         name: 'submit_review'
 
+
 <MainMenu>:
     BoxLayout:
         orientation: 'vertical'
@@ -33,6 +34,9 @@ WindowManager:
             text: 'Submit Review'
             on_release:
                 app.root.current = 'submit_review'
+        Button:
+            text: 'Exit App'
+            on_press: quit()
 
 <NewVenue>:
     BoxLayout:
@@ -109,10 +113,11 @@ WindowManager:
             text: 'Score'
         TextInput:
             id: score
-        Label:
-            text: '(select operator last)'
         BoxLayout:
             id: operators
+        Button:
+            text: 'Submit'
+            on_press: root.submit_operator()
         Label:
             id: message
         Button:
@@ -140,6 +145,9 @@ WindowManager:
             text:
         Label:
             id: message
+        Button:
+            text: 'Submit'
+            on_press: root.get_forecast()
         Button:
             text: 'Back'
             on_release:

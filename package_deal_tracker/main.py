@@ -1,4 +1,4 @@
-from kivy.app import App
+
 from kivy.core.window import Window  # For inspection.
 from kivy.lang import Builder
 from kivy.modules import inspector  # For inspection.
@@ -7,6 +7,11 @@ from kivy.uix.spinner import Spinner
 from deals import DealsDatabase, Forecasts, Venues, Operators, VenueScores, OperatorScores
 import installer
 import mysql.connector
+from kivy.app import App
+from kivy.properties import ListProperty
+from datetime import datetime, timedelta
+from api_key import API_KEY
+import requests
 
 
 class MainMenu(Screen):
@@ -60,29 +65,27 @@ class EditOperator(Screen):
         operators = app.get_operators()
         for operator in operators:
             spinner.values.append(str(operator).replace('(', '').replace(')', '').replace("'", '').replace(',', ''))
-        spinner.bind(text=self.submit_operator)
         self.ids.operators.add_widget(spinner)
 
-    def submit_operator(self, spinner, text):
+    def submit_operator(self):
         attributes = [self.ids.new_name.text, self.ids.score.text]
         app = App.get_running_app()
+        spinner = self.ids.operators.children[0]
 
         existing_operator = app.session.query(Operators).filter_by(name=attributes[0]).first()
 
         if any(attribute.isspace() or attribute == '' for attribute in attributes):
             self.ids.message.text = 'Fill in all text boxes'
             self.ids.new_name.text, self.ids.score.text = '', ''
-        if existing_operator:
+        elif existing_operator:
             self.ids.message.text = 'The entered operator already exists'
             self.ids.new_name.text, self.ids.score.text = '', ''
         else:
             self.ids.message.text = 'Success!'
             selection = spinner.text
             operator = app.session.query(Operators).filter_by(name=selection).first()
-
             operator.name = attributes[0]
             operator.rate_my_pilot_score = attributes[1]
-
             app.session.commit()
 
         self.ids.new_name.text, self.ids.score.text = '', ''
@@ -90,6 +93,7 @@ class EditOperator(Screen):
 
 class CheckForecast(Screen):
     def on_enter(self):
+        self.ids.forecast.text = ''
         self.ids.venues.clear_widgets()
         venue_spinner = Spinner(text='Select a venue', values=[])
         venue_spinner.id = 'venues'
@@ -98,46 +102,87 @@ class CheckForecast(Screen):
         seen_values = set()
         for venue in venues:
             if venue not in seen_values:
-                venue_spinner.values.append(str(venue).replace('(', '').replace(')', '').replace("'", '').replace(',', ''))
+                venue_spinner.values.append(
+                    str(venue).replace('(', '').replace(')', '').replace("'", '').replace(',', ''))
                 seen_values.add(venue)
-        venue_spinner.bind(text=self.get_forecast)
         self.ids.date.clear_widgets()
         date_spinner = Spinner(text='Select a date', values=[])
         date_spinner.id = 'dates'
-        dates = app.get_dates()
+        today = datetime.today().date()
+        dates = [today + timedelta(days=i) for i in range(5)]
         for date in dates:
-            if date not in seen_values:
-                date_spinner.values.append(
-                    str(date).replace('(', '').replace(')', '').replace("'", '').replace(',', ''))
-                seen_values.add(date)
-        date_spinner.bind(text=self.get_forecast)
+            date_spinner.values.append(str(date).replace('(', '').replace(')', '').replace("'", '').replace(',', ''))
         self.ids.date.add_widget(date_spinner)
         self.ids.venues.add_widget(venue_spinner)
 
-    def get_forecast(self, instance, value):
+    def get_forecast(self):
         app = App.get_running_app()
+        api_key = API_KEY
         venue_spinner = self.ids.venues.children[0]
         date_spinner = self.ids.date.children[0]
-        venue = venue_spinner.text
-        date = date_spinner.text
-        query = f"SELECT venue_id FROM Venues WHERE name='{venue}'"
-        result = app.execute_query(query)
-        if result:
-            venue_id = result[0][0]
-            if venue != 'Select a venue' and date != 'Select a date':
-                query = f"SELECT * FROM Forecasts WHERE venue_id={venue_id} AND date='{date}'"
-                result = app.execute_query(query)
-                if result:
-                    forecast = result[0]
-                    date = forecast[2]
-                    temp = forecast[3]
-                    humidity = forecast[4]
-                    wind = forecast[5]
-                    feels = forecast[6]
-                    precip = forecast[7]
-                    self.ids.forecast.text = f'Date:{date}, temperature (F):{temp}, humidity (%):{humidity}, wind speed (mph):{wind}, feels like (F):{feels}, precipitation (%): {precip}'
+        query_1 = f"SELECT latitude FROM Venues WHERE name='{venue_spinner.text}'"
+        query_2 = f"SELECT longitude FROM Venues WHERE name='{venue_spinner.text}'"
+        query_3 = f"SELECT venue_id FROM Venues WHERE name='{venue_spinner.text}'"
+        latitude = app.execute_query(query_1)[0][0]
+        longitude = app.execute_query(query_2)[0][0]
+        venue_id = int(app.execute_query(query_3)[0][0])
+        forecast_data = self.get_forecast_from_api(longitude, latitude, api_key)
+        for forecast in forecast_data:
+            last_id = int(app.session.query(Forecasts.forecast_id).order_by(Forecasts.forecast_id.desc()).first()[0])
+            forecast_id = last_id + 1
+            date_time = forecast["date_time"]
+            temperature = float(forecast["temperature"])
+            feels_like = float(forecast["feels_like"])
+            humidity = float(forecast["humidity"])
+            wind_speed = float(forecast["wind_speed"])
+            rain = float(forecast["rain"])
+            query = f"SELECT 1 FROM Forecasts WHERE venue_id = {venue_id} AND date_time = '{date_time}'"
+            result = app.execute_query(query)
+            if len(result) == 0:
+                addition = installer.Forecasts(forecast_id=forecast_id, venue_id=venue_id, date_time=date_time, temperature=temperature, feels_like=feels_like, humidity=humidity, wind_speed=wind_speed, rain=rain)
+                app.commit(addition)
+                query = f"INSERT INTO Forecasts (venue_id, date_time, temperature, feels_like, humidity, wind_speed, rain) VALUES ({venue_id}, '{date_time}', {temperature}, {humidity}, {wind_speed}, {feels_like}, {rain})"
+                app.execute_query(query)
+            if forecast["date_time"][:10] == f'{date_spinner.text}':
+                self.ids.forecast.text = f"\nDate and time: {date_time}\nTemperature: {temperature} F\nFeels like: {feels_like} F\nHumidity: {humidity}%\nWind speed: {wind_speed} mph\nChance of rain: {rain}%"
+
+    def get_forecast_from_api(self, longitude, latitude, api_key):
+        url = f"http://api.openweathermap.org/data/2.5/forecast?lat={latitude}&lon={longitude}&appid={api_key}&units=imperial"
+        response = requests.get(url)
+        weather_data = response.json()
+        forecast_data = []
+        found_today_forecast = False
+
+        for data in weather_data["list"]:
+            date_time_str = data["dt_txt"]
+            date_time_obj = datetime.strptime(date_time_str, '%Y-%m-%d %H:%M:%S')
+            hour = date_time_obj.hour
+            date = date_time_obj.date()
+            if hour == 12 or (not found_today_forecast and date == datetime.today().date()):
+                found_today_forecast = True
+                main = data["main"]
+                temperature = main["temp"]
+                humidity = main["humidity"]
+                feels_like = main["feels_like"]
+                if "rain" in data:
+                    rain = data["rain"]["3h"]
                 else:
-                    self.ids.forecast.text = 'No forecast for that day and venue.'
+                    rain = 0
+                wind = data["wind"]
+                wind_speed = wind["speed"]
+
+                forecast = {
+                    "date_time": date_time_str,
+                    "temperature": temperature,
+                    "feels_like": feels_like,
+                    "humidity": humidity,
+                    "wind_speed": wind_speed,
+                    "rain": rain,
+
+                }
+                forecast_data.append(forecast)
+
+        return forecast_data
 
 
 class SubmitReview(Screen):
@@ -150,7 +195,8 @@ class SubmitReview(Screen):
         seen_values = set()
         for venue in venues:
             if venue not in seen_values:
-                venue_spinner.values.append(str(venue).replace('(', '').replace(')', '').replace("'", '').replace(',', ''))
+                venue_spinner.values.append(
+                    str(venue).replace('(', '').replace(')', '').replace("'", '').replace(',', ''))
                 seen_values.add(venue)
         self.ids.operators.clear_widgets()
         operator_spinner = Spinner(text='Select an operator', values=[])
@@ -158,7 +204,8 @@ class SubmitReview(Screen):
         app = App.get_running_app()
         operators = app.get_operators()
         for operator in operators:
-            operator_spinner.values.append(str(operator).replace('(', '').replace(')', '').replace("'", '').replace(',', ''))
+            operator_spinner.values.append(
+                str(operator).replace('(', '').replace(')', '').replace("'", '').replace(',', ''))
         self.ids.venues.add_widget(venue_spinner)
         self.ids.operators.add_widget(operator_spinner)
 
@@ -194,7 +241,7 @@ class SubmitReview(Screen):
                 for score, in venue_scores:
                     venue_score_total += score
                     venue_scores_length += 1
-                average_score = (venue_score_total//venue_scores_length)
+                average_score = (venue_score_total // venue_scores_length)
                 venue.score = average_score
                 app.session.commit()
 
@@ -205,7 +252,8 @@ class SubmitReview(Screen):
                 operator = app.session.query(Operators).filter_by(name=operator_selection).first()
                 operator_id = operator.operator_id
                 score = operator_score
-                last_id = int(app.session.query(OperatorScores.score_id).order_by(OperatorScores.score_id.desc()).first()[0])
+                last_id = int(
+                    app.session.query(OperatorScores.score_id).order_by(OperatorScores.score_id.desc()).first()[0])
                 score_id = last_id + 1
                 addition = installer.OperatorScores(score=score, operator_id=operator_id, score_id=score_id)
                 app.commit(addition)
@@ -217,9 +265,10 @@ class SubmitReview(Screen):
                 for score, in operator_scores:
                     operator_score_total += score
                     operator_scores_length += 1
-                average_score = (operator_score_total//operator_scores_length)
+                average_score = (operator_score_total // operator_scores_length)
                 operator.rate_my_pilot_score = average_score
                 app.session.commit()
+
 
 class WindowManager(ScreenManager):
     pass
@@ -236,16 +285,8 @@ class PackageDealTracker(App):
         self.session.add(addition)
         self.session.commit()
 
-    def pull_operator(self, operator):
-        query = self.session.query(Operators)
-        return query
-
     def get_venues(self):
         query = self.session.query(Venues.name)
-        return query
-
-    def get_dates(self):
-        query = self.session.query(Forecasts.date)
         return query
 
     def get_operators(self):
@@ -253,14 +294,18 @@ class PackageDealTracker(App):
         return query
 
     def execute_query(self, query):
-        connection = mysql.connector.connect(host='localhost', port=3306, database='package_deals', user='root',
-                                             password='cse1208')
+        connection = mysql.connector.connect(host='localhost', port=3306, database='package_deals', user='root', password='cse1208')
         cursor = connection.cursor()
         cursor.execute(query)
-        result = cursor.fetchall()
+        if cursor.with_rows:
+            result = cursor.fetchall()
+        else:
+            result = None
         cursor.close()
         connection.close()
         return result
+
+    records = ListProperty([])
 
     def build(self):
         inspector.create_inspector(Window, self)

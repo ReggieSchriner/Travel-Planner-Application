@@ -38,12 +38,12 @@ class Forecasts(Persisted):
     __tablename__ = 'Forecasts'
     forecast_id = Column(Integer, primary_key=True)
     venue_id = Column(Integer, ForeignKey('Venues.venue_id'))
-    date = Column(String(256), nullable=False)
+    date_time = Column(String(256), nullable=False)
     temperature = Column(Float, nullable=False)
     humidity = Column(Float, nullable=False)
     wind_speed = Column(Float, nullable=False)
     feels_like = Column(Float, nullable=False)
-    precipitation = Column(Float, nullable=False)
+    rain = Column(Float, nullable=False)
     venue = relationship("Venues", back_populates="forecasts")
 
 
