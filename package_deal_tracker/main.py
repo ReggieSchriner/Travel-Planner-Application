@@ -1,4 +1,4 @@
-from kivy.app import App
+
 from kivy.core.window import Window  # For inspection.
 from kivy.lang import Builder
 from kivy.modules import inspector  # For inspection.
@@ -8,8 +8,6 @@ from deals import DealsDatabase, Forecasts, Venues, Operators, VenueScores, Oper
 import installer
 import mysql.connector
 from kivy.app import App
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.label import Label
 from kivy.properties import ListProperty
 from datetime import datetime, timedelta
 from api_key import API_KEY
@@ -155,22 +153,22 @@ class CheckForecast(Screen):
         forecast_data = []
         found_today_forecast = False
 
-        for entry in weather_data["list"]:
-            date_time_str = entry["dt_txt"]
+        for data in weather_data["list"]:
+            date_time_str = data["dt_txt"]
             date_time_obj = datetime.strptime(date_time_str, '%Y-%m-%d %H:%M:%S')
             hour = date_time_obj.hour
             date = date_time_obj.date()
             if hour == 12 or (not found_today_forecast and date == datetime.today().date()):
                 found_today_forecast = True
-                main = entry["main"]
+                main = data["main"]
                 temperature = main["temp"]
                 humidity = main["humidity"]
                 feels_like = main["feels_like"]
-                if "rain" in entry:
-                    rain = entry["rain"]["3h"]
+                if "rain" in data:
+                    rain = data["rain"]["3h"]
                 else:
                     rain = 0
-                wind = entry["wind"]
+                wind = data["wind"]
                 wind_speed = wind["speed"]
 
                 forecast = {
@@ -287,16 +285,8 @@ class PackageDealTracker(App):
         self.session.add(addition)
         self.session.commit()
 
-    def pull_operator(self, operator):
-        query = self.session.query(Operators)
-        return query
-
     def get_venues(self):
         query = self.session.query(Venues.name)
-        return query
-
-    def get_dates(self):
-        query = self.session.query(Forecasts.date)
         return query
 
     def get_operators(self):
@@ -317,29 +307,10 @@ class PackageDealTracker(App):
 
     records = ListProperty([])
 
-    def to_human_readable_time(timestamp):
-        return datetime.fromtimestamp(timestamp).strftime('%A %I:%M %p')
-
     def build(self):
         inspector.create_inspector(Window, self)
         kv = Builder.load_file('PackageDealTracker.kv')
         return kv
-
-
-class Record(Label):
-    pass
-
-
-class Records(BoxLayout):
-    records = ListProperty([])
-
-    def rebuild(self):
-        self.clear_widgets()
-        for record in self.records:
-            self.add_widget(Record(text=record))
-
-    def on_records(self, _, __):
-        self.rebuild()
 
 
 if __name__ == "__main__":
