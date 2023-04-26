@@ -126,25 +126,32 @@ class CheckForecast(Screen):
         latitude = app.execute_query(query_1)[0][0]
         longitude = app.execute_query(query_2)[0][0]
         venue_id = int(app.execute_query(query_3)[0][0])
-        forecast_data = self.get_forecast_from_api(longitude, latitude, api_key)
-        for forecast in forecast_data:
-            last_id = int(app.session.query(Forecasts.forecast_id).order_by(Forecasts.forecast_id.desc()).first()[0])
-            forecast_id = last_id + 1
-            date_time = forecast["date_time"]
-            temperature = float(forecast["temperature"])
-            feels_like = float(forecast["feels_like"])
-            humidity = float(forecast["humidity"])
-            wind_speed = float(forecast["wind_speed"])
-            rain = float(forecast["rain"])
-            query = f"SELECT 1 FROM Forecasts WHERE venue_id = {venue_id} AND date_time = '{date_time}'"
-            result = app.execute_query(query)
-            if len(result) == 0:
+        date_time = date_spinner.text
+        query = f"SELECT * FROM Forecasts WHERE venue_id={venue_id} AND date_time LIKE '{date_time[:10]}%'"
+        result = app.execute_query(query)
+        if len(result) == 0:
+            forecast_data = self.get_forecast_from_api(longitude, latitude, api_key)
+            for forecast in forecast_data:
+                last_id = int(app.session.query(Forecasts.forecast_id).order_by(Forecasts.forecast_id.desc()).first()[0])
+                forecast_id = last_id + 1
+                date_time = forecast["date_time"]
+                temperature = float(forecast["temperature"])
+                feels_like = float(forecast["feels_like"])
+                humidity = float(forecast["humidity"])
+                wind_speed = float(forecast["wind_speed"])
+                rain = float(forecast["rain"])
                 addition = installer.Forecasts(forecast_id=forecast_id, venue_id=venue_id, date_time=date_time, temperature=temperature, feels_like=feels_like, humidity=humidity, wind_speed=wind_speed, rain=rain)
                 app.commit(addition)
-                query = f"INSERT INTO Forecasts (venue_id, date_time, temperature, feels_like, humidity, wind_speed, rain) VALUES ({venue_id}, '{date_time}', {temperature}, {humidity}, {wind_speed}, {feels_like}, {rain})"
-                app.execute_query(query)
-            if forecast["date_time"][:10] == f'{date_spinner.text}':
-                self.ids.forecast.text = f"\nDate and time: {date_time}\nTemperature: {temperature} F\nFeels like: {feels_like} F\nHumidity: {humidity}%\nWind speed: {wind_speed} mph\nChance of rain: {rain}%"
+                if forecast["date_time"][:10] == f'{date_spinner.text}':
+                    self.ids.forecast.text = f"\nDate and time: {date_time}\nTemperature: {temperature} F\nFeels like: {feels_like} F\nHumidity: {humidity}%\nWind speed: {wind_speed} mph\nChance of rain: {rain}%"
+        else:
+            date_time = result[0][2]
+            temperature = result[0][3]
+            humidity = result[0][4]
+            wind_speed = result[0][5]
+            feels_like = result[0][6]
+            rain = result[0][7]
+            self.ids.forecast.text = f"\nDate and time: {date_time}\nTemperature: {temperature} F\nFeels like: {feels_like} F\nHumidity: {humidity}%\nWind speed: {wind_speed} mph\nChance of rain: {rain}%"
 
     def get_forecast_from_api(self, longitude, latitude, api_key):
         url = f"http://api.openweathermap.org/data/2.5/forecast?lat={latitude}&lon={longitude}&appid={api_key}&units=imperial"
