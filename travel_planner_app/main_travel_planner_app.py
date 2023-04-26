@@ -28,8 +28,14 @@ class LoadingScreen(Screen):
 class MainMenu(Screen):
     pass
 
+class ValidateLocationsPage(Screen):
+    pass
 
+class UpdateRatingsPage(Screen):
+    pass
 
+class  ItineraryPage(Screen):
+    pass
 
 if __name__ == '__main__':
     app = TravelPlannerApp()
