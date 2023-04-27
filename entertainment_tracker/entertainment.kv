@@ -1,17 +1,11 @@
-#:import SlideTransition kivy.uix.screenmanager.SlideTransition
-#:import Factory kivy.factory.Factory
 WindowManager:
-    transition: SlideTransition(direction='right' if app.advancing else 'left')
     HomeScreen:
-        name: 'home'
     VenueScreen:
-        name: 'venue'
     CityScreen:
-        name: 'city'
     WeatherScreen:
-        name: 'weather'
 
 <HomeScreen>:
+    name: 'home'
     BoxLayout:
         orientation: 'vertical'
         BoxLayout:
@@ -23,7 +17,6 @@ WindowManager:
                 font_size: sp(27)
             Widget:
                 size_hint: (.15, 1)
-        Widget:
         BoxLayout:
             orientation: 'horizontal'
             Widget:
@@ -35,8 +28,6 @@ WindowManager:
                     app.root.current = 'city'
             Widget:
                 size_hint: (.15, 1)
-        Widget:
-            size_hint: (1, .15)
         BoxLayout:
             orientation: 'horizontal'
             Widget:
@@ -48,10 +39,10 @@ WindowManager:
                     app.root.current = 'venue'
             Widget:
                 size_hint: (.15, 1)
-        Widget:
 
 <VenueScreen>:
     BoxLayout:
+        name: 'venue'
         orientation: 'vertical'
         BoxLayout:
             orientation: 'horizontal'
@@ -132,15 +123,15 @@ WindowManager:
                 app.root.current = 'home'
 
 <WeatherScreen>:
+    name: 'weather'
+    orientation: 'vertical'
     BoxLayout:
+        size_hint: (1, .2)
         orientation: 'vertical'
-        BoxLayout:
-            size_hint: (1, .2)
-            orientation: 'vertical'
-            Label:
-                text: 'Select weather conditions in which the venue'
-            Label:
-                text: 'will not function'
+        Label:
+            text: 'Select weather conditions in which the venue'
+        Label:
+            text: 'will not function'
         Widget:
             size_hint: (1, .15)
         BoxLayout:
@@ -242,9 +233,9 @@ WindowManager:
                 on_press:
                     root.save_weather_inputs()
                     Factory.MyPopup().open()
+
 <MyPopup@Popup>
     title: 'Success!'
-    size_hint: (.8, .3)
     BoxLayout:
         orientation: 'vertical'
         Label:
@@ -258,6 +249,7 @@ WindowManager:
                     app.root.current = 'home'
 
 <CityScreen>:
+    name: 'city'
     BoxLayout:
         orientation: 'vertical'
         BoxLayout:
@@ -301,8 +293,6 @@ WindowManager:
                     halign: 'center'
                 Widget:
                     size_hint: (.15, 1)
-        Widget:
-            size_hint: (1, .1)
         BoxLayout:
             orientation: 'vertical'
             Label:
@@ -327,8 +317,6 @@ WindowManager:
                     halign: 'center'
                 Widget:
                     size_hint: (.15, 1)
-        Widget:
-            size_hint: (1, .2)
         BoxLayout:
             Widget:
                 size_hint: (.15, 1)
@@ -339,13 +327,11 @@ WindowManager:
                     Factory.MyPopup2().open()
             Widget:
                 size_hint: (.15, 1)
-        Widget:
-            size_hint: (1, .1)
-        Button:
-            text: 'Exit'
-            on_press:
-                app.advancing = True
-                app.root.current = 'home'
+            Button:
+                text: 'Exit'
+                on_press:
+                    app.advancing = True
+                    app.root.current = 'home'
 
 <MyPopup2@Popup>
     title: 'Success!'

@@ -1,4 +1,5 @@
 from kivy.app import App
+from kivy.lang import Builder
 from kivy.properties import BooleanProperty, StringProperty
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.core.window import Window
@@ -93,6 +94,8 @@ class WindowManager(ScreenManager):
 class EntertainmentApp(App):
     advancing = BooleanProperty(True)
 
+
+kv = Builder.load_file('entertainment.kv')
 
 if __name__ == '__main__':
     app = EntertainmentApp()
