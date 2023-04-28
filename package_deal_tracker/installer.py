@@ -2,7 +2,7 @@ import json
 from datetime import datetime, timedelta
 from sys import stderr
 from sqlalchemy.exc import SQLAlchemyError
-from deals import Venues, DealsDatabase, Operators, Deals, Forecasts, VenueScores, OperatorScores
+from database import Venues, DealsDatabase, Operators, Deals, Forecasts, VenueScores, OperatorScores
 
 
 def add_starter_data(session):
@@ -75,6 +75,7 @@ def main():
         url = DealsDatabase.construct_mysql_url(authority=authority, port=port, database=database, username=username,
                                                 password=password)
         package_deal_database = DealsDatabase(url)
+        package_deal_database.drop_all_tables()
         package_deal_database.ensure_tables_exist()
         print('Tables created.')
         session = package_deal_database.create_session()

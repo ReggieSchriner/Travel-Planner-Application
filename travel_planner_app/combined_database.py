@@ -46,6 +46,7 @@ class Forecasts(Persisted):
     rain = Column(Float, nullable=False)
     venue = relationship("Venues", back_populates="forecasts")
 
+
 class OperatorScores(Persisted):
     __tablename__ = 'OperatorScores'
     score_id = Column(Integer, primary_key=True)
@@ -72,16 +73,15 @@ class Credentials(Persisted):
     weatherport = Column(Integer, nullable=False)
     apikey = Column(String(256), nullable=False)
 
-# class ItineraryEntries(Persisted):
-#     __tablename__ = 'ItineraryEntries'
-#     entry_id = Column(Integer, primary_key=True)
-#     itinerary_id = Column(Integer, nullable=False)
-#     itinerary_selected = Column(bool, nullable=False)
-#     day = Column(Integer, nullable=False)
-#     city = Column(String(256), nullable=False)
-#     venue = Column(String(256), nullable=False)
 
-
+class ItineraryEntries(Persisted):
+    __tablename__ = 'ItineraryEntries'
+    entry_id = Column(Integer, primary_key=True)
+    itinerary_id = Column(Integer, nullable=False)
+    itinerary_selected = Column(bool, nullable=False)
+    day = Column(Integer, nullable=False)
+    city = Column(String(256), nullable=False)
+    venue = Column(String(256), nullable=False)
 
 
 class DealsDatabase(object):
@@ -96,6 +96,9 @@ class DealsDatabase(object):
 
     def ensure_tables_exist(self):
         Persisted.metadata.create_all(self.engine)
+
+    def drop_all_tables(self):
+        Persisted.metadata.drop_all(self.engine)
 
     def create_session(self):
         return self.Session()

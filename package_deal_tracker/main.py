@@ -1,5 +1,4 @@
 import json
-
 from kivy.core.window import Window  # For inspection.
 from kivy.lang import Builder
 from kivy.modules import inspector  # For inspection.
@@ -7,7 +6,7 @@ from kivy.uix.button import Button
 from kivy.uix.popup import Popup
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.spinner import Spinner
-from deals import DealsDatabase, Forecasts, Venues, Operators, VenueScores, OperatorScores
+from database import DealsDatabase, Forecasts, Venues, Operators, VenueScores, OperatorScores
 import installer
 import mysql.connector
 from kivy.app import App
