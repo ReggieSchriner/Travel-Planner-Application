@@ -46,45 +46,50 @@ MainWindow:
                     pos_hint: {'center_x': .5, 'center_y': 1}
                     text: "Enter authority:"
                 TextInput:
-                    size_hint: 1, .5
+                    id: authority
+                    size_hint: 1, .65
                     pos_hint: {'center_x': .5, 'center_y': .5}
-                    text: ' '
+                    text: 'TCP'
                 Label:
                     font_size: sp(22)
                     size_hint: .5, .5
                     pos_hint: {'center_x': .5, 'center_y': 1}
                     text: "Enter in port number:"
                 TextInput:
-                    size_hint: 1, .5
+                    id: port
+                    size_hint: 1, .65
                     pos_hint: {'center_x': .5, 'center_y': .5}
-                    text: ' '
+                    text: '3306'
                 Label:
                     font_size: sp(22)
                     size_hint: .5, .5
                     pos_hint: {'center_x': .5, 'center_y': 1}
                     text: "Enter database name:"
                 TextInput:
-                    size_hint: 1, .5
+                    id: database
+                    size_hint: 1, .7
                     pos_hint: {'center_x': .5, 'center_y': .5}
-                    text: ' '
+                    text: 'combined_database'
                 Label:
                     font_size: sp(22)
                     size_hint: .5, .5
                     pos_hint: {'center_x': .5, 'center_y': 1}
                     text: "Enter username:"
                 TextInput:
-                    size_hint: 1, .5
+                    id: username
+                    size_hint: 1, .65
                     pos_hint: {'center_x': .5, 'center_y': .5}
-                    text: ' '
+                    text: 'zridha'
                 Label:
                     font_size: sp(22)
                     size_hint: .5, .5
                     pos_hint: {'center_x': .5, 'center_y': 1}
                     text: "Enter password:"
                 TextInput:
-                    size_hint: 1, .5
+                    id: password
+                    size_hint: 1, .65
                     pos_hint: {'center_x': .5, 'center_y': .5}
-                    text: ' '
+                    password: True
             BoxLayout:
                 padding: 10
                 spacing: 10
@@ -107,25 +112,28 @@ MainWindow:
                     pos_hint: {'center_x': .5, 'center_y': 1}
                     text: "Enter authority:"
                 TextInput:
-                    size_hint: 1, .32
+                    id: weatherauthority
+                    size_hint: 1, .65
                     pos_hint: {'center_x': .5, 'center_y': .5}
-                    text: ' '
+                    text: 'api.openweathermap.org'
                 Label:
                     font_size: sp(22)
                     size_hint: .5, .5
                     pos_hint: {'center_x': .5, 'center_y': 1}
                     text: "Enter in port number:"
                 TextInput:
-                    size_hint: 1, .32
+                    id: weatherport
+                    size_hint: 1, .65
                     pos_hint: {'center_x': .5, 'center_y': .5}
-                    text: ' '
+                    text: '443'
                 Label:
                     font_size: sp(22)
                     size_hint: .5, .5
                     pos_hint: {'center_x': .5, 'center_y': 1}
                     text: "Enter API key:"
                 TextInput:
-                    size_hint: 1, .32
+                    id: apikey
+                    size_hint: 1, .65
                     pos_hint: {'center_x': .5, 'center_y': .5}
                     text: ' '
         BoxLayout:
