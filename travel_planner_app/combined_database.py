@@ -46,7 +46,6 @@ class Forecasts(Persisted):
     rain = Column(Float, nullable=False)
     venue = relationship("Venues", back_populates="forecasts")
 
-
 class OperatorScores(Persisted):
     __tablename__ = 'OperatorScores'
     score_id = Column(Integer, primary_key=True)
@@ -72,6 +71,17 @@ class Credentials(Persisted):
     weatherauthority = Column(String(256), nullable=False)
     weatherport = Column(Integer, nullable=False)
     apikey = Column(String(256), nullable=False)
+
+# class ItineraryEntries(Persisted):
+#     __tablename__ = 'ItineraryEntries'
+#     entry_id = Column(Integer, primary_key=True)
+#     itinerary_id = Column(Integer, nullable=False)
+#     itinerary_selected = Column(bool, nullable=False)
+#     day = Column(Integer, nullable=False)
+#     city = Column(String(256), nullable=False)
+#     venue = Column(String(256), nullable=False)
+
+
 
 
 class DealsDatabase(object):

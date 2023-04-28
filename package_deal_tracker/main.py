@@ -1,3 +1,5 @@
+import json
+
 from kivy.core.window import Window  # For inspection.
 from kivy.lang import Builder
 from kivy.modules import inspector  # For inspection.
@@ -230,10 +232,6 @@ class SubmitReview(Screen):
         operator_spinner = self.ids.operators.children[0]
         operator_selection = operator_spinner.text
         operator_score = self.ids.operator_score.text
-        venue_scores_length = 0
-        operator_scores_length = 0
-        venue_score_total = 0
-        operator_score_total = 0
 
         if venue_selection != 'Select a venue':
             if venue_score.isspace() or venue_score == '':
@@ -248,14 +246,6 @@ class SubmitReview(Screen):
                 app.commit(addition)
                 app.session.commit()
                 self.ids.venue_score.text = ''
-                query = app.session.query(VenueScores.score).filter(VenueScores.venue_id == venue_id)
-                venue_scores = query.all()
-                for score, in venue_scores:
-                    venue_score_total += score
-                    venue_scores_length += 1
-                average_score = (venue_score_total // venue_scores_length)
-                venue.score = average_score
-                app.session.commit()
         if operator_selection != 'Select an operator':
             if operator_score.isspace() or operator_score == '':
                 self.ids.message.text = 'Please enter an operator score'
@@ -270,36 +260,45 @@ class SubmitReview(Screen):
                 app.commit(addition)
                 app.session.commit()
                 self.ids.operator_score.text = ''
-                query = app.session.query(OperatorScores.score).filter(OperatorScores.operator_id == operator_id)
-                operator_scores = query.all()
-                for score, in operator_scores:
-                    operator_score_total += score
-                    operator_scores_length += 1
-                average_score = (operator_score_total // operator_scores_length)
-                operator.rate_my_pilot_score = average_score
-                app.session.commit()
         if operator_selection != 'Select an operator' or venue_selection != 'Select a venue':
             popup = PackageDealTracker.create_popup(self=self)
             popup.content.bind(on_press=lambda instance: WindowManager.popup_button_pressed(popup=popup, self=self))
+
+
+class ReviewItinerary(Screen):
+    pass
 
 
 class WindowManager(ScreenManager):
     def popup_button_pressed(self, popup):
         self.current = 'main_menu'
         popup.dismiss()
+
     pass
 
 
 class PackageDealTracker(App):
     def __init__(self, **kwargs):
+        f = open('credentials.json')
+        data = json.load(f)
+        attributes = []
+        for element in data.values():
+            attributes.append(element)
+        authority = attributes[0]
+        port = attributes[1]
+        database = attributes[2]
+        username = attributes[3]
+        password = attributes[4]
         super(PackageDealTracker, self).__init__(**kwargs)
-        url = DealsDatabase.construct_mysql_url('localhost', 3306, 'package_deals', 'root', 'cse1208')
+        url = DealsDatabase.construct_mysql_url(authority=authority, port=port, database=database, username=username,
+                                                password=password)
         self.deals_database = DealsDatabase(url)
         self.session = self.deals_database.create_session()
 
     def create_popup(self):
         content = Button(text='Return to Main Menu')
-        popup = Popup(title='         Success!', content=content, size_hint=(None, None), size=(400, 400), auto_dismiss=False)
+        popup = Popup(title='         Success!', content=content, size_hint=(None, None), size=(400, 400),
+                      auto_dismiss=False)
         content.bind(on_press=lambda instance: self.manager.popup_button_pressed(popup=popup))
         popup.open()
         return popup
@@ -317,8 +316,18 @@ class PackageDealTracker(App):
         return query
 
     def execute_query(self, query):
-        connection = mysql.connector.connect(host='localhost', port=3306, database='package_deals', user='root',
-                                             password='cse1208')
+        f = open('credentials.json')
+        data = json.load(f)
+        attributes = []
+        for element in data.values():
+            attributes.append(element)
+        authority = attributes[0]
+        port = attributes[1]
+        database = attributes[2]
+        username = attributes[3]
+        password = attributes[4]
+        connection = mysql.connector.connect(authority=authority, port=port, database=database, username=username,
+                                             password=password)
         cursor = connection.cursor()
         cursor.execute(query)
         if cursor.with_rows:
