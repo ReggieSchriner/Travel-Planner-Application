@@ -164,13 +164,13 @@ class CheckForecast(Screen):
     def get_forecast_from_api(self, longitude, latitude, api_key):
         url = f"http://api.openweathermap.org/data/2.5/forecast?lat={latitude}&lon={longitude}&appid={api_key}&units=imperial"
         response = requests.get(url)
-        weather_data = response.json()
-        forecast_data = []
+        forecasts_from_api = response.json()
+        forecasts = []
         found_today_forecast = False
 
-        for data in weather_data["list"]:
-            date_time_str = data["dt_txt"]
-            date_time_obj = datetime.strptime(date_time_str, '%Y-%m-%d %H:%M:%S')
+        for data in forecasts_from_api["list"]:
+            date_time_data = data["dt_txt"]
+            date_time_obj = datetime.strptime(date_time_data, '%Y-%m-%d %H:%M:%S')
             hour = date_time_obj.hour
             date = date_time_obj.date()
             if hour == 12 or (not found_today_forecast and date == datetime.today().date()):
@@ -186,18 +186,10 @@ class CheckForecast(Screen):
                 wind = data["wind"]
                 wind_speed = wind["speed"]
 
-                forecast = {
-                    "date_time": date_time_str,
-                    "temperature": temperature,
-                    "feels_like": feels_like,
-                    "humidity": humidity,
-                    "wind_speed": wind_speed,
-                    "rain": rain,
+                forecast = {"date_time": date_time_data, "temperature": temperature, "feels_like": feels_like, "humidity": humidity, "wind_speed": wind_speed, "rain": rain}
+                forecasts.append(forecast)
 
-                }
-                forecast_data.append(forecast)
-
-        return forecast_data
+        return forecasts
 
 
 class SubmitReview(Screen):
