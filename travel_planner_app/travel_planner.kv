@@ -147,6 +147,7 @@ MainWindow:
                 pos_hint: {'center_x': .5}
                 text: 'Submit'
                 font_size: sp(22)
+                on_press: app.get_forecast_from_api(apikey.text)
                 on_release: app.root.current = 'loading_screen'
 
 <LoadingScreen>

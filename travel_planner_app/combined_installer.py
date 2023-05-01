@@ -1,7 +1,7 @@
 from datetime import datetime, date, timedelta
 from sys import stderr
 from sqlalchemy.exc import SQLAlchemyError
-from combined_database import Venues, DealsDatabase, Operators, Deals, Forecasts, VenueScores, OperatorScores, \
+from database import Venues, DealsDatabase, Operators, Deals, Forecasts, VenueScores, OperatorScores, \
     Credentials
 
 
@@ -86,7 +86,7 @@ def add_starter_data(session):
 
 def main():
     try:
-        url = DealsDatabase.construct_mysql_url('localhost', 3306, 'combined_database', 'root', 'cse1208')
+        url = DealsDatabase.construct_mysql_url('cse.unl.edu', 3306, 'zridha', 'zridha', 'q2H-sn')
         package_deal_database = DealsDatabase(url)
         package_deal_database.ensure_tables_exist()
         print('Tables created.')
