@@ -1,7 +1,8 @@
-from datetime import datetime, date, timedelta
+import json
+from datetime import datetime, timedelta
 from sys import stderr
 from sqlalchemy.exc import SQLAlchemyError
-from deals import Venues, DealsDatabase, Operators, Deals, Forecasts, VenueScores, OperatorScores
+from database import Venues, DealsDatabase, Operators, Deals, Forecasts, VenueScores, OperatorScores
 
 
 def add_starter_data(session):
@@ -15,13 +16,20 @@ def add_starter_data(session):
     # create forecasts
     today = str(datetime.today().date())
     tomorrow = str(datetime.today() + timedelta(days=1))
-    olive_garden_forecast_1 = Forecasts(venue=olive_garden, date_time=today, temperature=70, humidity=50, wind_speed=10, feels_like=75, rain=0)
-    olive_garden_forecast_2 = Forecasts(venue=olive_garden, date_time=tomorrow, temperature=80, humidity=60, wind_speed=5, feels_like=85, rain=0)
-    marcus_grand_cinema_forecast_1 = Forecasts(venue=marcus_grand_cinema, date_time=today, temperature=72, humidity=45, wind_speed=12, feels_like=78, rain=0)
-    marcus_grand_cinema_forecast_2 = Forecasts(venue=marcus_grand_cinema, date_time=tomorrow, temperature=75, humidity=50, wind_speed=10, feels_like=80, rain=0)
-    pinnacle_bank_arena_forecast_1 = Forecasts(venue=pinnacle_bank_arena, date_time=today, temperature=65, humidity=40, wind_speed=15, feels_like=70, rain=0)
-    pinnacle_bank_arena_forecast_2 = Forecasts(venue=pinnacle_bank_arena, date_time=tomorrow, temperature=70, humidity=45, wind_speed=13, feels_like=75, rain=0)
-    session.add_all([olive_garden_forecast_1, olive_garden_forecast_2, marcus_grand_cinema_forecast_1, marcus_grand_cinema_forecast_2, pinnacle_bank_arena_forecast_1, pinnacle_bank_arena_forecast_2])
+    olive_garden_forecast_1 = Forecasts(venue=olive_garden, date_time=today, temperature=70, humidity=50, wind_speed=10,
+                                        feels_like=75, rain=0)
+    olive_garden_forecast_2 = Forecasts(venue=olive_garden, date_time=tomorrow, temperature=80, humidity=60,
+                                        wind_speed=5, feels_like=85, rain=0)
+    marcus_grand_cinema_forecast_1 = Forecasts(venue=marcus_grand_cinema, date_time=today, temperature=72, humidity=45,
+                                               wind_speed=12, feels_like=78, rain=0)
+    marcus_grand_cinema_forecast_2 = Forecasts(venue=marcus_grand_cinema, date_time=tomorrow, temperature=75,
+                                               humidity=50, wind_speed=10, feels_like=80, rain=0)
+    pinnacle_bank_arena_forecast_1 = Forecasts(venue=pinnacle_bank_arena, date_time=today, temperature=65, humidity=40,
+                                               wind_speed=15, feels_like=70, rain=0)
+    pinnacle_bank_arena_forecast_2 = Forecasts(venue=pinnacle_bank_arena, date_time=tomorrow, temperature=70,
+                                               humidity=45, wind_speed=13, feels_like=75, rain=0)
+    session.add_all([olive_garden_forecast_1, olive_garden_forecast_2, marcus_grand_cinema_forecast_1,
+                     marcus_grand_cinema_forecast_2, pinnacle_bank_arena_forecast_1, pinnacle_bank_arena_forecast_2])
     session.commit()
 
     # create operators
@@ -54,8 +62,20 @@ def add_starter_data(session):
 
 def main():
     try:
-        url = DealsDatabase.construct_mysql_url('localhost', 3306, 'package_deals', 'root', 'cse1208')
+        f = open('credentials.json')
+        data = json.load(f)
+        attributes = []
+        for element in data.values():
+            attributes.append(element)
+        authority = attributes[0]
+        port = attributes[1]
+        database = attributes[2]
+        username = attributes[3]
+        password = attributes[4]
+        url = DealsDatabase.construct_mysql_url(authority=authority, port=port, database=database, username=username,
+                                                password=password)
         package_deal_database = DealsDatabase(url)
+        package_deal_database.drop_all_tables()
         package_deal_database.ensure_tables_exist()
         print('Tables created.')
         session = package_deal_database.create_session()

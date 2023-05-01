@@ -11,6 +11,8 @@ WindowManager:
         name: 'check_forecast'
     SubmitReview:
         name: 'submit_review'
+    ReviewItinerary:
+        name: 'review_itinerary'
 
 
 <MainMenu>:
@@ -34,6 +36,10 @@ WindowManager:
             text: 'Submit Review'
             on_release:
                 app.root.current = 'submit_review'
+        Button:
+            text: 'Review Itinerary'
+            on_release:
+                app.root.current = 'review_itinerary'
         Button:
             text: 'Exit App'
             on_press: quit()
@@ -184,6 +190,36 @@ WindowManager:
         Label:
             text: ''
             id: message
+        Button:
+            text: 'Back'
+            on_release:
+                app.root.current = 'main_menu'
+
+<ReviewItinerary>:
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: 'Choose an itinerary'
+        BoxLayout:
+            orientation: 'horizontal'
+            Label:
+                text: 'Itinerary 1'
+            Label:
+                text: 'Itinerary 2'
+        BoxLayout:
+            orientation: 'horizontal'
+            Label:
+                text: ''
+                id: itinerary_1
+            Label:
+                text:''
+                id: itinerary_2
+        BoxLayout:
+            orientation: 'horizontal'
+            Button:
+                text: 'Itinerary 1'
+            Button:
+                text: 'Itinerary 2'
         Button:
             text: 'Back'
             on_release:
