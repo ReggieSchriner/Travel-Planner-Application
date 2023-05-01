@@ -10,7 +10,6 @@ from database import DealsDatabase, Forecasts, Venues, Operators, VenueScores, O
 import installer
 import mysql.connector
 from kivy.app import App
-from kivy.properties import ListProperty
 from datetime import datetime, timedelta
 from api_key import API_KEY
 import requests
@@ -37,7 +36,6 @@ class NewVenue(Screen):
         else:
             addition = installer.Venues(name=attributes[0], latitude=attributes[1], longitude=attributes[2],
                                         type=attributes[3])
-            app = App.get_running_app()
             app.commit(addition)
             popup = PackageDealTracker.create_popup(self=self)
             popup.content.bind(on_press=lambda instance: WindowManager.popup_button_pressed(popup=popup, self=self))
@@ -328,8 +326,6 @@ class PackageDealTracker(App):
         cursor.close()
         connection.close()
         return result
-
-    records = ListProperty([])
 
     def build(self):
         inspector.create_inspector(Window, self)
