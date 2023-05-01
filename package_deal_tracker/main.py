@@ -20,42 +20,50 @@ class MainMenu(Screen):
 
 
 class NewVenue(Screen):
-    def add_venue(self):
+    def add_venue(self, venue=None):
         app = App.get_running_app()
-        attributes = [self.ids.name.text, self.ids.latitude.text, self.ids.longitude.text, self.ids.type.text]
-        existing_venue = app.session.query(Venues).filter_by(name=attributes[0]).first()
-        if any(attribute.isspace() or attribute == '' for attribute in attributes):
-            self.ids.message.text = 'Fill in all text boxes'
-            self.ids.name.text, self.ids.latitude.text, self.ids.longitude.text, self.ids.type.text = '', '', '', ''
-        elif (-90 > float(attributes[1]) < 90) or (-180 > float(attributes[2]) < 180):
-            self.ids.message.text = 'Invalid longitude or latitude'
-            self.ids.name.text, self.ids.latitude.text, self.ids.longitude.text, self.ids.type.text = '', '', '', ''
-        elif existing_venue:
-            self.ids.message.text = 'The given venue already exists'
-            self.ids.name.text, self.ids.latitude.text, self.ids.longitude.text, self.ids.type.text = '', '', '', ''
+        if venue is None:
+            attributes = [self.ids.name.text, self.ids.latitude.text, self.ids.longitude.text, self.ids.type.text]
+            existing_venue = app.session.query(Venues).filter_by(name=attributes[0]).first()
+            if any(attribute.isspace() or attribute == '' for attribute in attributes):
+                self.ids.message.text = 'Fill in all text boxes'
+                self.ids.name.text, self.ids.latitude.text, self.ids.longitude.text, self.ids.type.text = '', '', '', ''
+            elif (-90 > float(attributes[1]) < 90) or (-180 > float(attributes[2]) < 180):
+                self.ids.message.text = 'Invalid longitude or latitude'
+                self.ids.name.text, self.ids.latitude.text, self.ids.longitude.text, self.ids.type.text = '', '', '', ''
+            elif existing_venue:
+                self.ids.message.text = 'The given venue already exists'
+                self.ids.name.text, self.ids.latitude.text, self.ids.longitude.text, self.ids.type.text = '', '', '', ''
+            else:
+                addition = installer.Venues(name=attributes[0], latitude=attributes[1], longitude=attributes[2],
+                                            type=attributes[3])
+                app.commit(addition)
+                popup = PackageDealTracker.create_popup(self=self)
+                popup.content.bind(on_press=lambda instance: WindowManager.popup_button_pressed(popup=popup, self=self))
+                self.ids.name.text, self.ids.latitude.text, self.ids.longitude.text, self.ids.type.text = '', '', '', ''
         else:
-            addition = installer.Venues(name=attributes[0], latitude=attributes[1], longitude=attributes[2],
-                                        type=attributes[3])
-            app.commit(addition)
-            popup = PackageDealTracker.create_popup(self=self)
-            popup.content.bind(on_press=lambda instance: WindowManager.popup_button_pressed(popup=popup, self=self))
-            self.ids.name.text, self.ids.latitude.text, self.ids.longitude.text, self.ids.type.text = '', '', '', ''
+            app.session.add(venue)
+            app.session.commit()
 
 
 class AddEditOperator(Screen):
-    def add_operator(self):
-        attributes = [self.ids.name.text, self.ids.score.text]
+    def add_operator(self, operator=None):
+        app = App.get_running_app()
+        if operator is None:
+            attributes = [self.ids.name.text, self.ids.score.text]
 
-        if any(attribute.isspace() or attribute == '' for attribute in attributes):
-            self.ids.message.text = 'Fill in all text boxes'
-            self.ids.new_name.text, self.ids.score.text = '', ''
+            if any(attribute.isspace() or attribute == '' for attribute in attributes):
+                self.ids.message.text = 'Fill in all text boxes'
+                self.ids.name.text, self.ids.score.text = '', ''
+            else:
+                addition = installer.Operators(name=attributes[0], rate_my_pilot_score=attributes[1])
+                app.commit(addition)
+                popup = PackageDealTracker.create_popup(self=self)
+                popup.content.bind(on_press=lambda instance: WindowManager.popup_button_pressed(popup=popup, self=self))
+                self.ids.name.text, self.ids.score.text = '', ''
         else:
-            addition = installer.Operators(name=attributes[0], rate_my_pilot_score=attributes[1])
-            app = App.get_running_app()
-            app.commit(addition)
-            popup = PackageDealTracker.create_popup(self=self)
-            popup.content.bind(on_press=lambda instance: WindowManager.popup_button_pressed(popup=popup, self=self))
-            self.ids.name.text, self.ids.score.text = '', ''
+            app.session.add(operator)
+            app.session.commit()
 
 
 class EditOperator(Screen):
@@ -69,28 +77,34 @@ class EditOperator(Screen):
             spinner.values.append(str(operator).replace('(', '').replace(')', '').replace("'", '').replace(',', ''))
         self.ids.operators.add_widget(spinner)
 
-    def submit_operator(self):
-        attributes = [self.ids.new_name.text, self.ids.score.text]
+    def submit_operator(self, operator=None, name=None, new_name=None, score=None):
         app = App.get_running_app()
-        spinner = self.ids.operators.children[0]
+        if operator is None:
+            attributes = [self.ids.new_name.text, self.ids.score.text]
+            spinner = self.ids.operators.children[0]
 
-        existing_operator = app.session.query(Operators).filter_by(name=attributes[0]).first()
+            existing_operator = app.session.query(Operators).filter_by(name=attributes[0]).first()
 
-        if any(attribute.isspace() or attribute == '' for attribute in attributes):
-            self.ids.message.text = 'Fill in all text boxes'
-            self.ids.new_name.text, self.ids.score.text = '', ''
-        elif existing_operator:
-            self.ids.message.text = 'The entered operator already exists'
-            self.ids.new_name.text, self.ids.score.text = '', ''
+            if any(attribute.isspace() or attribute == '' for attribute in attributes):
+                self.ids.message.text = 'Fill in all text boxes'
+                self.ids.new_name.text, self.ids.score.text = '', ''
+            elif existing_operator:
+                self.ids.message.text = 'The entered operator already exists'
+                self.ids.new_name.text, self.ids.score.text = '', ''
+            else:
+                selection = spinner.text
+                operator = app.session.query(Operators).filter_by(name=selection).first()
+                operator.name = attributes[0]
+                operator.rate_my_pilot_score = attributes[1]
+                app.session.commit()
+                popup = PackageDealTracker.create_popup(self=self)
+                popup.content.bind(on_press=lambda instance: WindowManager.popup_button_pressed(popup=popup, self=self))
+                self.ids.new_name.text, self.ids.score.text = '', ''
         else:
-            selection = spinner.text
-            operator = app.session.query(Operators).filter_by(name=selection).first()
-            operator.name = attributes[0]
-            operator.rate_my_pilot_score = attributes[1]
+            operator = app.session.query(Operators).filter_by(name=name).first()
+            operator.name = new_name
+            operator.rate_my_pilot_score = score
             app.session.commit()
-            popup = PackageDealTracker.create_popup(self=self)
-            popup.content.bind(on_press=lambda instance: WindowManager.popup_button_pressed(popup=popup, self=self))
-            self.ids.new_name.text, self.ids.score.text = '', ''
 
 
 class CheckForecast(Screen):
@@ -117,14 +131,16 @@ class CheckForecast(Screen):
         self.ids.date.add_widget(date_spinner)
         self.ids.venues.add_widget(venue_spinner)
 
-    def get_forecast(self):
+    def get_forecast(self, date=None, venue=None):
         app = App.get_running_app()
         api_key = API_KEY
         venue_spinner = self.ids.venues.children[0]
         date_spinner = self.ids.date.children[0]
-        query_1 = f"SELECT latitude FROM Venues WHERE name='{venue_spinner.text}'"
-        query_2 = f"SELECT longitude FROM Venues WHERE name='{venue_spinner.text}'"
-        query_3 = f"SELECT venue_id FROM Venues WHERE name='{venue_spinner.text}'"
+        venue = venue_spinner.text if venue is None else venue
+        date = date_spinner.text if date is None else date
+        query_1 = f"SELECT latitude FROM Venues WHERE name='{venue}'"
+        query_2 = f"SELECT longitude FROM Venues WHERE name='{venue}'"
+        query_3 = f"SELECT venue_id FROM Venues WHERE name='{venue}'"
         latitude = app.execute_query(query_1)[0][0]
         longitude = app.execute_query(query_2)[0][0]
         venue_id = int(app.execute_query(query_3)[0][0])
@@ -147,7 +163,7 @@ class CheckForecast(Screen):
                                                temperature=temperature, feels_like=feels_like, humidity=humidity,
                                                wind_speed=wind_speed, rain=rain)
                 app.commit(addition)
-                if forecast["date_time"][:10] == f'{date_spinner.text}':
+                if forecast["date_time"][:10] == f'{date}':
                     self.ids.forecast.text = f"\nDate and time: {date_time}\nTemperature: {temperature} F\nFeels like: {feels_like} F\nHumidity: {humidity}%\nWind speed: {wind_speed} mph\nChance of rain: {rain}%"
         else:
             date_time = result[0][2]
@@ -157,6 +173,8 @@ class CheckForecast(Screen):
             feels_like = result[0][6]
             rain = result[0][7]
             self.ids.forecast.text = f"\nDate and time: {date_time}\nTemperature: {temperature} F\nFeels like: {feels_like} F\nHumidity: {humidity}%\nWind speed: {wind_speed} mph\nChance of rain: {rain}%"
+
+
 
     def get_forecast_from_api(self, longitude, latitude, api_key):
         url = f"http://api.openweathermap.org/data/2.5/forecast?lat={latitude}&lon={longitude}&appid={api_key}&units=imperial"
@@ -183,7 +201,8 @@ class CheckForecast(Screen):
                 wind = data["wind"]
                 wind_speed = wind["speed"]
 
-                forecast = {"date_time": date_time_data, "temperature": temperature, "feels_like": feels_like, "humidity": humidity, "wind_speed": wind_speed, "rain": rain}
+                forecast = {"date_time": date_time_data, "temperature": temperature, "feels_like": feels_like,
+                            "humidity": humidity, "wind_speed": wind_speed, "rain": rain}
                 forecasts.append(forecast)
 
         return forecasts
@@ -213,14 +232,14 @@ class SubmitReview(Screen):
         self.ids.venues.add_widget(venue_spinner)
         self.ids.operators.add_widget(operator_spinner)
 
-    def submit_scores(self):
+    def submit_scores(self, venue_selection=None, operator_selection=None, venue_score=None, operator_score=None):
         app = App.get_running_app()
         venue_spinner = self.ids.venues.children[0]
-        venue_selection = venue_spinner.text
-        venue_score = self.ids.venue_score.text
+        venue_selection = venue_spinner.text if venue_selection is None else venue_selection
+        venue_score = self.ids.venue_score.text if venue_score is None else venue_score
         operator_spinner = self.ids.operators.children[0]
-        operator_selection = operator_spinner.text
-        operator_score = self.ids.operator_score.text
+        operator_selection = operator_spinner.text if operator_selection is None else operator_selection
+        operator_score = self.ids.operator_score.text if operator_score is None else operator_score
 
         if venue_selection != 'Select a venue':
             if venue_score.isspace() or venue_score == '':

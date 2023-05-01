@@ -63,7 +63,7 @@ def add_starter_data(session):
 # Set up database
 def main():
     try:
-        url = database.DealsDatabase.construct_mysql_url('localhost', 3306, 'deals_data', 'root', 'cse1208')
+        url = database.DealsDatabase.construct_mysql_url('localhost', 3306, 'deals_test', 'root', 'cse1208')
         package_deal_database = DealsDatabase(url)
         package_deal_database.drop_all_tables()
         package_deal_database.ensure_tables_exist()
