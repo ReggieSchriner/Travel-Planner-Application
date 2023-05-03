@@ -83,7 +83,7 @@ class CredentialsWindow(Screen):
 class LoadingScreen(Screen):
     def on_enter(self):
         Clock.schedule_once(self.switch_to_next_screen, 2)
-
+        
     def switch_to_next_screen(self, *args):
         self.manager.current = 'main_menu'
 
