@@ -334,7 +334,7 @@ class PackageDealTracker(App):
         database = attributes[2]
         username = attributes[3]
         password = attributes[4]
-        connection = mysql.connector.connect(authority=authority, port=port, database=database, username=username,
+        connection = mysql.connector.connect(host=authority, port=port, database=database, user=username,
                                              password=password)
         cursor = connection.cursor()
         cursor.execute(query)
