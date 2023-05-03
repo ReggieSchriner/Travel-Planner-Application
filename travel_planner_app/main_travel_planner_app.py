@@ -1,5 +1,7 @@
+from datetime import datetime
 from json import dumps
 
+import requests
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.core.window import Window  # For inspection
@@ -10,6 +12,7 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 from rest import RESTConnection
 from travel_planner_app import combined_installer
 from travel_planner_app.database import DealsDatabase
+from urllib.parse import quote
 
 UNL_LATITUDE = 40.8207
 UNL_LONGITUDE = -96.7005
@@ -29,28 +32,10 @@ class TravelPlannerApp(App):
         kv = Builder.load_file("travel_planner.kv")
         return kv
 
-    def get_forecast_from_api(self, api_key):
-        # url = f"http://api.openweathermap.org/data/2.5/forecast?port=443&lat=40.813618&lon=-96.702599&appid={api_key}&units=imperial"
-        # response = requests.get(url)
-        # if response.status_code != 200:
-        #     print("error")
-        print(api_key);
-        self.records = []
-        connection = RESTConnection('api.openweathermap.org', 443, '/data/2.5')
-        connection.send_request(
-            'forecast',
-            {
-                'appid': api_key,
-                'lat': UNL_LATITUDE,
-                'lon': UNL_LONGITUDE,
-                'units': UNITS,
-                'cnt': COUNT
-            },
-            None,
-            self.on_records_loaded,
-            self.on_records_not_loaded,
-            self.on_records_not_loaded
-        )
+    def construct_url(self, resource, get_parameters=None):
+        parameter_string = '&'.join(f'{quote(str(key))}={quote(str(value))}' for key, value in get_parameters.items()) \
+            if get_parameters is not None else ''
+        return f'https://{self.authority}:{self.port}{self.root_path}/{resource}?{parameter_string}'
 
     def on_records_loaded(self, _, response):
         print(dumps(response, indent=4, sort_keys=True))
