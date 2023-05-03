@@ -1,3 +1,4 @@
+
 MainWindow:
     CredentialsWindow:
     LoadingScreen:
@@ -135,7 +136,7 @@ MainWindow:
                     id: apikey
                     size_hint: 1, .65
                     pos_hint: {'center_x': .5, 'center_y': .5}
-                    text: ' '
+                    text: ''
         BoxLayout:
             orientation: 'vertical'
             padding: 50
@@ -147,7 +148,7 @@ MainWindow:
                 pos_hint: {'center_x': .5}
                 text: 'Submit'
                 font_size: sp(22)
-                on_press: app.get_forecast_from_api(apikey.text)
+                on_press: app.construct_url({"appid":f"{apikey.text.strip()}", "units":"imperial"})
                 on_release: app.root.current = 'loading_screen'
 
 <LoadingScreen>

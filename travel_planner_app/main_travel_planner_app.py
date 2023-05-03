@@ -1,3 +1,5 @@
+import base64
+import json
 from datetime import datetime
 from json import dumps
 
@@ -7,9 +9,10 @@ from kivy.clock import Clock
 from kivy.core.window import Window  # For inspection
 from kivy.lang import Builder
 from kivy.modules import inspector  # For inspection
+from kivy.network.urlrequest import UrlRequest
 from kivy.uix.screenmanager import ScreenManager, Screen
 
-from rest import RESTConnection
+import rest
 from travel_planner_app import combined_installer
 from travel_planner_app.database import DealsDatabase
 from urllib.parse import quote
@@ -30,12 +33,12 @@ class TravelPlannerApp(App):
     def build(self):
         inspector.create_inspector(Window, self)
         kv = Builder.load_file("travel_planner.kv")
+        self.rest_connection = rest.RESTConnection(authority='api.openweathermap.org', port=443, root_path='/data/2.5')
         return kv
 
-    def construct_url(self, resource, get_parameters=None):
-        parameter_string = '&'.join(f'{quote(str(key))}={quote(str(value))}' for key, value in get_parameters.items()) \
-            if get_parameters is not None else ''
-        return f'https://{self.authority}:{self.port}{self.root_path}/{resource}?{parameter_string}'
+    def construct_url(self, get_parameters=None):
+        resource = 'forecast'
+        print(self.rest_connection.construct_url(resource, get_parameters))
 
     def on_records_loaded(self, _, response):
         print(dumps(response, indent=4, sort_keys=True))
