@@ -148,7 +148,7 @@ MainWindow:
                 pos_hint: {'center_x': .5}
                 text: 'Submit'
                 font_size: sp(22)
-                on_press: app.construct_url({"appid":f"{apikey.text.strip()}", "units":"imperial"})
+                on_press: app.construct_url({"appid":f"{apikey.text}", "units":"imperial"})
                 on_release: app.root.current = 'loading_screen'
 
 <LoadingScreen>

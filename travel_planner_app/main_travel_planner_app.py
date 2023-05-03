@@ -37,9 +37,14 @@ class TravelPlannerApp(App):
         return kv
 
     def construct_url(self, get_parameters=None):
-        resource = 'forecast'
-        print(self.rest_connection.construct_url(resource, get_parameters))
-
+        try:
+            resource = 'forecast'
+            if get_parameters["appid"] != '':
+                url = self.rest_connection.construct_url(resource, get_parameters)
+        except:
+            self.root.ids.apikey.text = ''
+            self.root.ids.error.text = 'Invalid api key, try again.'
+        return url
     def on_records_loaded(self, _, response):
         print(dumps(response, indent=4, sort_keys=True))
         print('success')
@@ -82,6 +87,7 @@ class CredentialsWindow(Screen):
 
 class LoadingScreen(Screen):
     def on_enter(self):
+
         Clock.schedule_once(self.switch_to_next_screen, 2)
 
     def switch_to_next_screen(self, *args):
