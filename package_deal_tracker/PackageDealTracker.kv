@@ -14,186 +14,417 @@ WindowManager:
     ReviewItinerary:
         name: 'review_itinerary'
 
-
 <MainMenu>:
     BoxLayout:
+        canvas.before:
+            Color:
+                rgba:(0, 0, .08, 1)
+            Rectangle:
+                pos: self.pos
+                size: self.size
         orientation: 'vertical'
-        Label:
-            text: 'Package Deal Tracker'
-        Button:
-            text: 'New Venue'
-            on_release:
-                app.root.current = 'new_venue'
-        Button:
-            text: 'Add/Edit Operator'
-            on_release:
-                app.root.current = 'add/edit_operator'
-        Button:
-            text: 'Check Forecast'
-            on_release:
-                app.root.current = 'check_forecast'
-        Button:
-            text: 'Submit Review'
-            on_release:
-                app.root.current = 'submit_review'
-        Button:
-            text: 'Review Itinerary'
-            on_release:
-                app.root.current = 'review_itinerary'
-        Button:
-            text: 'Exit App'
-            on_press: quit()
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint: 1, .05
+            Label:
+                text: 'Package Deal Tracker'
+                rgba: (217, 162, 190, 0.8)
+                font_size: sp(40)
+                size_hint: .5, .5
+                pos_hint: {'center_x': .5}
+                bold: True
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint: 1, .3
+            padding: 40
+            spacing: 10
+            Button:
+                text: 'New Venue'
+                background_color:(.1, .3, .8, 0.9)
+                pos_hint: {'center_x': .5}
+                size_hint: .6, 1
+                font_size: sp(22)
+                on_release:
+                    app.root.current = 'new_venue'
+            Button:
+                text: 'Add/Edit Operator'
+                background_color:(.1, .3, .8, 0.9)
+                pos_hint: {'center_x': .5}
+                size_hint: .6, 1
+                font_size: sp(22)
+                on_release:
+                    app.root.current = 'add/edit_operator'
+            Button:
+                text: 'Check Forecast'
+                background_color:(.1, .3, .8, 0.9)
+                pos_hint: {'center_x': .5}
+                size_hint: .6, 1
+                font_size: sp(22)
+                on_release:
+                    app.root.current = 'check_forecast'
+            Button:
+                text: 'Submit Review'
+                background_color:(.1, .3, .8, 0.9)
+                pos_hint: {'center_x': .5}
+                size_hint: .6, 1
+                font_size: sp(22)
+                on_release:
+                    app.root.current = 'submit_review'
+            Button:
+                text: 'Review Itinerary'
+                background_color:(.1, .3, .8, 0.9)
+                pos_hint: {'center_x': .5}
+                size_hint: .6, 1
+                font_size: sp(22)
+                on_release:
+                    app.root.current = 'review_itinerary'
+            Button:
+                text: 'Exit App'
+                background_color:(.5, .1, .2, 0.9)
+                size_hint: .3, .7
+                pos_hint: {'center_x': .5}
+                font_size: sp(22)
+                on_press: quit()
 
 <NewVenue>:
     BoxLayout:
+        canvas.before:
+            Color:
+                rgba:(0, 0, .08, 1)
+            Rectangle:
+                pos: self.pos
+                size: self.size
         orientation: 'vertical'
-        Label:
-            text: 'New Venue'
-        Label:
-            text: 'Name'
-        TextInput:
-            id: name
-        Label:
-            text: 'Longitude'
-        TextInput:
-            id: longitude
-            input_filter: 'float'
-        Label:
-            text: 'Latitude'
-        TextInput:
-            id: latitude
-            input_filter: 'float'
-        Label:
-            text: 'Type'
-        TextInput:
-            id: type
-        Button:
-            text: 'Submit'
-            on_press: root.add_venue()
-        Label:
-            text: ''
-            id: message
-        Button:
-            text: 'Back'
-            on_release:
-                app.root.current = 'main_menu'
+        BoxLayout:
+            padding: 10
+            spacing: 10
+            orientation: 'vertical'
+            Label:
+                text: 'New Venue'
+                rgba: (217, 162, 190, 0.8)
+                font_size: sp(40)
+                size_hint: .5, .5
+                pos_hint: {'center_x': .5}
+                bold: True
+            Label:
+                text: "Enter in new venue's name:"
+                font_size: sp(22)
+                size_hint: .5, .5
+                pos_hint: {'center_x': .5, 'center_y': 1}
+            TextInput:
+                id: name
+                size_hint: .80, .65
+                pos_hint: {'center_x': .5, 'center_y': .5}
+            Label:
+                text: "Enter in new venue's Longitude:"
+                font_size: sp(22)
+                size_hint: .5, .5
+                pos_hint: {'center_x': .5, 'center_y': 1}
+            TextInput:
+                id: longitude
+                size_hint: .80, .65
+                pos_hint: {'center_x': .5, 'center_y': .5}
+                input_filter: 'float'
+            Label:
+                text: "Enter in new venue's Latitude:"
+                font_size: sp(22)
+                size_hint: .5, .5
+                pos_hint: {'center_x': .5, 'center_y': 1}
+            TextInput:
+                id: latitude
+                size_hint: .80, .65
+                pos_hint: {'center_x': .5, 'center_y': .5}
+                input_filter: 'float'
+            Label:
+                text: "Enter in new venue's type:"
+                font_size: sp(22)
+                size_hint: .5, .5
+                pos_hint: {'center_x': .5, 'center_y': 1}
+            TextInput:
+                id: type
+                size_hint: .80, .65
+                pos_hint: {'center_x': .5, 'center_y': .5}
+            Button:
+                text: 'Submit'
+                background_color:(.1, .3, .8, 0.9)
+                size_hint: .3, 1
+                pos_hint: {'center_x': .5}
+                font_size: sp(22)
+                on_press: root.add_venue()
+            Label:
+                text: ''
+                id: message
+            Button:
+                background_color:(.5, .1, .2, 0.9)
+                size_hint: .35, 1
+                pos_hint: {'center_x': .5}
+                font_size: sp(22)
+                text: 'Back'
+                on_release:
+                    app.root.current = 'main_menu'
 
 <AddEditOperator>:
     BoxLayout:
+        canvas.before:
+            Color:
+                rgba:(0, 0, .08, 1)
+            Rectangle:
+                pos: self.pos
+                size: self.size
         orientation: 'vertical'
-        Label:
-            text: 'Add/Edit Operator'
-        Label:
-            text: 'Name'
-        TextInput:
-            id: name
-        Label:
-            text: 'Score'
-        TextInput:
-            id: score
-            input_filter: 'float'
-        Button:
-            text: 'Add'
-            on_press: root.add_operator()
-        Label:
-            id: message
-        Button:
-            text: 'Edit Operator'
-            on_release:
-                app.root.current = 'edit_operator'
-        Button:
-            text: 'Back'
-            on_release:
-                app.root.current = 'main_menu'
+        BoxLayout:
+            padding: 10
+            spacing: 10
+            orientation: 'vertical'
+            Label:
+                text: 'Add/Edit Operator'
+                rgba: (217, 162, 190, 0.8)
+                font_size: sp(40)
+                size_hint: .5, .5
+                pos_hint: {'center_x': .5}
+                bold: True
+            Label:
+                text: "Enter in operator's Name:"
+                font_size: sp(22)
+                size_hint: .5, .5
+                pos_hint: {'center_x': .5, 'center_y': 1}
+            TextInput:
+                id: name
+                size_hint: .80, .65
+                pos_hint: {'center_x': .5, 'center_y': .5}
+            Label:
+                text: "Enter in operator's score:"
+                font_size: sp(22)
+                size_hint: .5, .5
+                pos_hint: {'center_x': .5, 'center_y': 1}
+            TextInput:
+                id: score
+                input_filter: 'float'
+                size_hint: .80, .65
+                pos_hint: {'center_x': .5, 'center_y': .5}
+            Button:
+                text: 'Add'
+                background_color:(.1, .3, .8, 0.9)
+                size_hint: .3, .7
+                pos_hint: {'center_x': .5}
+                font_size: sp(22)
+                on_press: root.add_operator()
+            BoxLayout:
+                orientation: 'vertical'
+                Label:
+                    id: message
+                    size_hint: 1, 1
+            Button:
+                text: 'Edit Operator'
+                background_color:(.1, .3, .8, 0.9)
+                size_hint: .3, .7
+                pos_hint: {'center_x': .5}
+                font_size: sp(22)
+                on_release:
+                    app.root.current = 'edit_operator'
+            Button:
+                text: 'Back'
+                background_color:(.5, .1, .2, 0.9)
+                size_hint: .35, .7
+                pos_hint: {'center_x': .5}
+                font_size: sp(22)
+                on_release:
+                    app.root.current = 'main_menu'
 
 <EditOperator>:
     BoxLayout:
+        canvas.before:
+            Color:
+                rgba:(0, 0, .08, 1)
+            Rectangle:
+                pos: self.pos
+                size: self.size
         orientation: 'vertical'
-        Label:
-            text: 'Edit Operator'
-        Label:
-            text: 'New name'
-        TextInput:
-            id: new_name
-        Label:
-            text: 'Score'
-        TextInput:
-            id: score
         BoxLayout:
-            id: operators
-        Button:
-            text: 'Submit'
-            on_press: root.submit_operator()
-        Label:
-            id: message
-        Button:
-            text: 'Back'
-            on_release:
-                app.root.current = 'add/edit_operator'
+            padding: 10
+            spacing: 10
+            orientation: 'vertical'
+            Label:
+                text: 'Edit Operator'
+                rgba: (217, 162, 190, 0.8)
+                font_size: sp(40)
+                size_hint: .5, .5
+                pos_hint: {'center_x': .5}
+                bold: True
+            Label:
+                text: 'Enter in new name: '
+                font_size: sp(22)
+                size_hint: .5, .5
+                pos_hint: {'center_x': .5, 'center_y': 1}
+            TextInput:
+                id: new_name
+                size_hint: .80, .65
+                pos_hint: {'center_x': .5, 'center_y': .5}
+            Label:
+                text: 'Enter in new score: '
+                font_size: sp(22)
+                size_hint: .5, .5
+                pos_hint: {'center_x': .5, 'center_y': 1}
+            TextInput:
+                id: score
+                size_hint: .80, .65
+                pos_hint: {'center_x': .5, 'center_y': .5}
+            BoxLayout:
+                id: operators
+            Button:
+                text: 'Submit'
+                background_color:(.1, .3, .8, 0.9)
+                size_hint: .3, .7
+                pos_hint: {'center_x': .5}
+                font_size: sp(22)
+                on_press: root.submit_operator()
+            Label:
+                id: message
+            Button:
+                text: 'Back'
+                background_color:(.5, .1, .2, 0.9)
+                size_hint: .35, .7
+                pos_hint: {'center_x': .5}
+                font_size: sp(22)
+                on_release:
+                    app.root.current = 'add/edit_operator'
 
 <CheckForecast>:
     BoxLayout:
+        canvas.before:
+            Color:
+                rgba:(0, 0, .08, 1)
+            Rectangle:
+                pos: self.pos
+                size: self.size
         orientation: 'vertical'
-        Label:
-            text: 'Check Forecast'
-        Label:
-            text: 'Date'
         BoxLayout:
-            id: date
-        Label:
-            text: 'Venue'
-        BoxLayout:
-            id: venues
-        Label:
-            text: 'Forecast'
-        Label:
-            id: forecast
-            text:
-        Label:
-            id: message
-        Button:
-            text: 'Submit'
-            on_press: root.get_forecast()
-        Button:
-            text: 'Back'
-            on_release:
-                app.root.current = 'main_menu'
+            orientation: 'vertical'
+            padding: 10
+            spacing: 10
+            Label:
+                text: 'Check Forecast'
+                rgba: (217, 162, 190, 0.8)
+                font_size: sp(40)
+                size_hint: .5, .5
+                pos_hint: {'center_x': .5}
+                bold: True
+            Label:
+                text: 'Date'
+                font_size: sp(22)
+                size_hint: .5, .5
+                pos_hint: {'center_x': .5, 'center_y': 1}
+            BoxLayout:
+                id: date
+            Label:
+                text: 'Venue'
+                font_size: sp(22)
+                size_hint: .5, .5
+                pos_hint: {'center_x': .5, 'center_y': 1}
+            BoxLayout:
+                id: venues
+            Label:
+                text: 'Forecast'
+                font_size: sp(22)
+                size_hint: .5, .5
+                pos_hint: {'center_x': .5, 'center_y': 1}
+            Label:
+                id: forecast
+                text:
+            Label:
+                id: message
+            Button:
+                text: 'Submit'
+                background_color:(.1, .3, .8, 0.9)
+                size_hint: .3, .7
+                pos_hint: {'center_x': .5}
+                font_size: sp(22)
+                on_press: root.get_forecast()
+            Button:
+                text: 'Back'
+                background_color:(.5, .1, .2, 0.9)
+                size_hint: .35, .7
+                pos_hint: {'center_x': .5}
+                font_size: sp(22)
+                on_release:
+                    app.root.current = 'main_menu'
 
 <SubmitReview>
     BoxLayout:
+        canvas.before:
+            Color:
+                rgba:(0, 0, .08, 1)
+            Rectangle:
+                pos: self.pos
+                size: self.size
         orientation: 'vertical'
-        Label:
-            text: 'Submit Review'
-        Label:
-            text: 'Venue'
-        Label:
-            text: 'Score'
-        TextInput:
-            id: venue_score
-            input_filter: 'int'
         BoxLayout:
+            padding: 10
+            spacing: 10
             orientation: 'vertical'
-            id: venues
-        Label:
-            text: 'Operator'
-        Label:
-            text: 'Score'
-        TextInput:
-            id: operator_score
-            input_filter: 'int'
-        BoxLayout:
-            orientation: 'vertical'
-            id: operators
-        Button:
-            text: 'Submit'
-            on_press: root.submit_scores()
-        Label:
-            text: ''
-            id: message
-        Button:
-            text: 'Back'
-            on_release:
-                app.root.current = 'main_menu'
+            Label:
+                text: 'Submit Review'
+                rgba: (217, 162, 190, 0.8)
+                font_size: sp(40)
+                size_hint: .5, .5
+                pos_hint: {'center_x': .5}
+                bold: True
+            Label:
+                text: 'Venue'
+                underline: True
+                font_size: sp(22)
+                size_hint: .5, .5
+                pos_hint: {'center_x': .5, 'center_y': 1}
+            Label:
+                text: 'Score'
+                font_size: sp(22)
+                size_hint: .5, .5
+                pos_hint: {'center_x': .5, 'center_y': 1}
+            TextInput:
+                id: venue_score
+                input_filter: 'int'
+                size_hint: .80, .65
+                pos_hint: {'center_x': .5, 'center_y': .5}
+            BoxLayout:
+                orientation: 'vertical'
+                id: venues
+            Label:
+                text: 'Operator'
+                underline: True
+                font_size: sp(22)
+                size_hint: .5, .5
+                pos_hint: {'center_x': .5, 'center_y': 1}
+            Label:
+                text: 'Score'
+                font_size: sp(22)
+                size_hint: .5, .5
+                pos_hint: {'center_x': .5, 'center_y': 1}
+            TextInput:
+                id: operator_score
+                input_filter: 'int'
+                size_hint: .80, .65
+                pos_hint: {'center_x': .5, 'center_y': .5}
+            BoxLayout:
+                orientation: 'vertical'
+                id: operators
+            Button:
+                text: 'Submit'
+                background_color:(.1, .3, .8, 0.9)
+                size_hint: .3, .7
+                pos_hint: {'center_x': .5}
+                font_size: sp(22)
+                on_press: root.submit_scores()
+            Label:
+                text: ''
+                id: message
+            Button:
+                text: 'Back'
+                background_color:(.5, .1, .2, 0.9)
+                size_hint: .35, .7
+                pos_hint: {'center_x': .5}
+                font_size: sp(22)
+                on_release:
+                    app.root.current = 'main_menu'
 
 <ReviewItinerary>:
     BoxLayout:
@@ -224,4 +455,3 @@ WindowManager:
             text: 'Back'
             on_release:
                 app.root.current = 'main_menu'
-
