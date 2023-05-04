@@ -1,11 +1,11 @@
-
-MainWindow:
+WindowManager:
     CredentialsWindow:
     LoadingScreen:
     MainMenu:
     ValidateLocationsPage:
     UpdateRatingsPage:
     ItineraryPage:
+
 <CredentialsWindow>
     name: 'credentials'
     BoxLayout:
@@ -141,8 +141,8 @@ MainWindow:
             orientation: 'vertical'
             size_hint: 1, .18
             Label:
-                id: error
-                text: ''
+                id: message
+                text: 'This is the error message'
         BoxLayout:
             orientation: 'vertical'
             padding: 50
@@ -154,8 +154,7 @@ MainWindow:
                 pos_hint: {'center_x': .5}
                 text: 'Submit'
                 font_size: sp(22)
-                on_press: app.construct_url({"appid":f"{apikey.text}", "units":"imperial"})
-                on_release: app.root.current = 'loading_screen'
+                on_press: app.credentials_window.add_credentials()
 
 <LoadingScreen>
     name: 'loading_screen'
