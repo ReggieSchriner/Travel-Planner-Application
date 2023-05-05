@@ -24,16 +24,23 @@
 
 2. Package Deal Tracker App
 
-    First, in order to use the application the user must create the needed database using MySQL in the terminal.
+    First, in order to use the application the user must have a MySQL server set up with their own password.
+    Instructions for this can be found here: https://computing.unl.edu/faq-section/working-remotely/#node-302
+
     Next, create a file called 'credentials.json' in the same folder and enter the following dictionary with your 
-    user credentials filled in where the varibles are surrounded with < > (be sure to enter 
-    them as strings sourrounded with ""): 
-    {"authority":"cse.unl.edu", "port":3306,"database":<databse>,"username":<username>,"password":<password>}. 
+    user credentials filled in where the varibles are surrounded with < > (be sure to enter them as strings 
+    sourrounded with ""): 
+    {"authority":"cse.unl.edu", "port":3306,"database":<databse>,"username":<username>,"password":<password>}.
+
     Then open the app folder in PyCharm and locate the installer file (not the test installer). Run 
     the installer and make sure the tables and database are created. This is shown by the print statements that 
-    should be given after the file is used. After running the installer, creating the database, and adding your 
-    credentials, the main app can be used by running the main.py file. Then the GUI can be used to interact with 
-    and access the rest of the app. To use the unit tests, run the test_installer.py file and then the tests.py
-    file will work. As you will see, all tests are passing.
+    should be given after the file is used. 
+    
+    After running the installer, creating the database, and adding your credentials, the main app can be used by 
+    running the main.py file. Then the GUI can be used to interact with and access the rest of the app. 
+
+    To use the unit tests, run the test_installer.py file and then the tests.py file will function as expected. As 
+    you will see, all tests are passing and each test check the functionality of the methods that interact with the
+    database by using a local databse to run the tests.
 
 3. Entertainment Tracker App
