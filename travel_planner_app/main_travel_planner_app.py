@@ -174,16 +174,16 @@ class TravelPlannerApp(App):
         inspector.create_inspector(Window, self)
         kv = Builder.load_file("travel_planner.kv")
         self.credentials_window = CredentialsWindow()
-        self.rest_connection = rest.RESTConnection(authority='api.openweathermap.org', port=443, root_path='/data/2.5')
-        self.forecast_rest_connection = rest.RESTConnection(self.ids.weatherauthority.text,
-                                                            self.ids.weatherport.text, '/data/2.5',
-                                                            self.ids.apikey.text)
-        self.geocoding_rest_connection = rest.RESTConnection(self.ids.weatherauthority.text,
-                                                             self.ids.weatherport.text, '/geo/1.0',
-                                                             self.ids.apikey.text)
+        # self.rest_connection = rest.RESTConnection(authority='api.openweathermap.org', port=443, root_path='/data/2.5')
+        # self.forecast_rest_connection = rest.RESTConnection(self.ids.weatherauthority.text,
+        #                                                     self.ids.weatherport.text, '/data/2.5',
+        #                                                     self.ids.apikey.text)
+        # self.geocoding_rest_connection = rest.RESTConnection(self.ids.weatherauthority.text,
+        #                                                      self.ids.weatherport.text, '/geo/1.0',
+        #                                                      self.ids.apikey.text)
 
-        self.forecast_rest_connection.send_request('weather', {'q': 'Lincoln'}, None, None, ConnectionError,
-                                                   ConnectionError)
+        # self.forecast_rest_connection.send_request('weather', {'q': 'Lincoln'}, None, None, ConnectionError,
+        #                                            ConnectionError)
         return kv
 
     def construct_url(self, get_parameters=None):
