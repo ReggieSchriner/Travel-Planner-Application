@@ -50,7 +50,6 @@ WindowManager:
                     id: authority
                     size_hint: 1, .65
                     pos_hint: {'center_x': .5, 'center_y': .5}
-                    text: 'TCP'
                 Label:
                     font_size: sp(22)
                     size_hint: .5, .5
@@ -60,7 +59,6 @@ WindowManager:
                     id: port
                     size_hint: 1, .65
                     pos_hint: {'center_x': .5, 'center_y': .5}
-                    text: '3306'
                 Label:
                     font_size: sp(22)
                     size_hint: .5, .5
@@ -70,7 +68,6 @@ WindowManager:
                     id: database
                     size_hint: 1, .7
                     pos_hint: {'center_x': .5, 'center_y': .5}
-                    text: 'combined_database'
                 Label:
                     font_size: sp(22)
                     size_hint: .5, .5
@@ -80,12 +77,10 @@ WindowManager:
                     id: username
                     size_hint: 1, .65
                     pos_hint: {'center_x': .5, 'center_y': .5}
-                    text: 'zridha'
                 Label:
                     font_size: sp(22)
                     size_hint: .5, .5
                     pos_hint: {'center_x': .5, 'center_y': 1}
-                    text: "Enter password:"
                 TextInput:
                     id: password
                     size_hint: 1, .65
@@ -116,7 +111,6 @@ WindowManager:
                     id: weatherauthority
                     size_hint: 1, .65
                     pos_hint: {'center_x': .5, 'center_y': .5}
-                    text: 'api.openweathermap.org'
                 Label:
                     font_size: sp(22)
                     size_hint: .5, .5
@@ -126,7 +120,6 @@ WindowManager:
                     id: weatherport
                     size_hint: 1, .65
                     pos_hint: {'center_x': .5, 'center_y': .5}
-                    text: '443'
                 Label:
                     font_size: sp(22)
                     size_hint: .5, .5
@@ -136,7 +129,6 @@ WindowManager:
                     id: apikey
                     size_hint: 1, .65
                     pos_hint: {'center_x': .5, 'center_y': .5}
-                    text: ''
         BoxLayout:
             orientation: 'vertical'
             size_hint: 1, .18
@@ -154,7 +146,7 @@ WindowManager:
                 pos_hint: {'center_x': .5}
                 text: 'Submit'
                 font_size: sp(22)
-                on_press: app.credentials_window.add_credentials()
+                on_press: app.credentials_window.submit_credentials()
 
 <LoadingScreen>
     name: 'loading_screen'
