@@ -89,7 +89,6 @@ WindowManager:
                     size_hint: (.15, 1)
                 TextInput:
                     id: city
-                    text: ''
                     multiline: False
                     write_tab: False
                     halign: 'center'
@@ -111,10 +110,8 @@ WindowManager:
                     values: 'Indoor Restaurant', 'Outdoor Restaurant', 'Indoor Sports Arena', 'Outdoor Sports Arena', 'Indoor Theater', 'Outdoor Theater'
                 Widget:
                     size_hint: (.15, 1)
-        Label:
+        Widget:
             size_hint: (1, .2)
-            id: error
-            text: ''
         BoxLayout:
             Widget:
                 size_hint: (.15, 1)
@@ -123,7 +120,7 @@ WindowManager:
                 on_press:
                     root.save_venue_inputs()
                     app.advancing = False
-                    if root.open_weather_screen: app.root.current = 'weather'
+                    app.root.current = 'weather'
             Widget:
                 size_hint: (.15, 1)
         Widget:
@@ -330,9 +327,7 @@ WindowManager:
                     halign: 'center'
                 Widget:
                     size_hint: (.15, 1)
-        Label:
-            id: error
-            text: ''
+        Widget:
             size_hint: (1, .2)
         BoxLayout:
             Widget:
@@ -341,7 +336,7 @@ WindowManager:
                 text: 'Submit!'
                 on_press:
                     root.save_city_inputs()
-                    if root.open_popup: root.show_popup()
+                    Factory.MyPopup2().open()
             Widget:
                 size_hint: (.15, 1)
         Widget:
@@ -352,7 +347,7 @@ WindowManager:
                 app.advancing = True
                 app.root.current = 'home'
 
-<CityPopup>
+<MyPopup2@Popup>
     title: 'Success!'
     size_hint: (.8, .3)
     BoxLayout:
@@ -365,7 +360,6 @@ WindowManager:
                 on_press:
                     root.dismiss()
                     app.advancing = False
-                    # root.obj.go_to_venue()
                     app.root.current = 'venue'
             Button:
                 text: 'No'

@@ -1,4 +1,5 @@
 from kivy.app import App
+from kivy.lang import Builder
 from kivy.properties import BooleanProperty, StringProperty
 from kivy.uix.popup import Popup
 from kivy.uix.screenmanager import ScreenManager, Screen
@@ -146,6 +147,8 @@ class EntertainmentApp(App):
         self.session.add(addition)
         self.session.commit()
 
+
+kv = Builder.load_file('entertainment.kv')
 
 if __name__ == '__main__':
     app = EntertainmentApp()
