@@ -32,7 +32,6 @@ class CredentialsWindow(Screen):
         self.geocoding_rest_connection = None
 
     def add_credentials(self):
-        app = App.get_running_app()
         try:
             f = open('credentials.json')
             data = json.load(f)
@@ -48,6 +47,7 @@ class CredentialsWindow(Screen):
             weatherport = attributes[6]
             apikey = attributes[7]
             self.ids.authority.text = authority
+            print(self.ids.authority.text)
             self.ids.port.text = port
             self.ids.database.text = database
             self.ids.username.text = username
@@ -65,9 +65,9 @@ class CredentialsWindow(Screen):
             self.popup_message.text = 'JSON file indices not set up correctly. \nCheck readme for documentation'
 
     def submit_credentials(self):
-        app = App.get_running_app()
+        running_app = App.get_running_app()
         try:
-            url = app.construct_url({"appid": f"{self.ids.apikey.text}", "units": "imperial"})
+            url = running_app.construct_url({"appid": f"{self.ids.apikey.text}", "units": "imperial"})
             if url is None:
                 self.ids.message.text = 'Please enter a valid api key'
             attributes = [self.ids.authority.text, self.ids.port.text, self.ids.database.text,
@@ -98,8 +98,8 @@ class CredentialsWindow(Screen):
 
                 self.forecast_rest_connection.send_request('weather', {'q': 'Lincoln'}, None, None, ConnectionError,
                                                            ConnectionError)
-                app = App.get_running_app()
-                app.commit(addition)
+                running_app = App.get_running_app()
+                running_app.commit(addition)
             self.ids.authority.text, self.ids.port.text, self.ids.database.text, \
             self.ids.username.text, self.ids.password.text, \
             self.ids.weatherauthority.text, self.ids.weatherport.text, \
@@ -139,7 +139,8 @@ class CredentialsWindow(Screen):
 
             return self.switch_screen('loading_screen')
 
-
+    # def on_enter(self, *args):
+    #     self.add_credentials()
 class LoadingScreen(Screen):
     def on_enter(self):
         Clock.schedule_once(self.switch_to_next_screen, 2)
@@ -170,20 +171,17 @@ class ItineraryPage(Screen):
 
 class TravelPlannerApp(App):
 
+    def __init__(self):
+        super().__init__()
+        self.rest_connection = None
+        self.credentials_window = None
+
     def build(self):
         inspector.create_inspector(Window, self)
         kv = Builder.load_file("travel_planner.kv")
         self.credentials_window = CredentialsWindow()
-        # self.rest_connection = rest.RESTConnection(authority='api.openweathermap.org', port=443, root_path='/data/2.5')
-        # self.forecast_rest_connection = rest.RESTConnection(self.ids.weatherauthority.text,
-        #                                                     self.ids.weatherport.text, '/data/2.5',
-        #                                                     self.ids.apikey.text)
-        # self.geocoding_rest_connection = rest.RESTConnection(self.ids.weatherauthority.text,
-        #                                                      self.ids.weatherport.text, '/geo/1.0',
-        #                                                      self.ids.apikey.text)
-
-        # self.forecast_rest_connection.send_request('weather', {'q': 'Lincoln'}, None, None, ConnectionError,
-        #                                            ConnectionError)
+        #self.credentials_window = kv.ids.credentials
+        # self.credentials_window.add_credentials()
         return kv
 
     def construct_url(self, get_parameters=None):
