@@ -11,8 +11,6 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 from lazr.restfulclient.errors import HTTPError
 from mysql.connector import OperationalError, ProgrammingError
 from sqlalchemy.exc import SQLAlchemyError
-
-import rest
 from travel_planner_app import combined_installer
 
 UNL_LATITUDE = 40.8207

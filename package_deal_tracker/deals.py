@@ -1,3 +1,4 @@
+from sqlalchemy import Table
 from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, Float
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
@@ -21,7 +22,7 @@ class Venues(Persisted):
     latitude = Column(Float, nullable=False)
     longitude = Column(Float, nullable=False)
     type = Column(String(256), nullable=False)
-    score = Column(Integer)
+    score = Column(Integer, nullable=False)
     deals = relationship("Deals", back_populates="venue")
     forecasts = relationship("Forecasts", back_populates="venue")
 
@@ -38,40 +39,62 @@ class Forecasts(Persisted):
     __tablename__ = 'Forecasts'
     forecast_id = Column(Integer, primary_key=True)
     venue_id = Column(Integer, ForeignKey('Venues.venue_id'))
-    date_time = Column(String(256), nullable=False)
+    date = Column(String(256), nullable=False)
     temperature = Column(Float, nullable=False)
     humidity = Column(Float, nullable=False)
     wind_speed = Column(Float, nullable=False)
     feels_like = Column(Float, nullable=False)
-    rain = Column(Float, nullable=False)
+    precipitation = Column(Float, nullable=False)
     venue = relationship("Venues", back_populates="forecasts")
-
 
 class OperatorScores(Persisted):
     __tablename__ = 'OperatorScores'
     score_id = Column(Integer, primary_key=True)
     operator_id = Column(Integer, ForeignKey('Operators.operator_id'))
-    score = Column(Integer)
 
-
-class VenueScores(Persisted):
+class VenueScore(Persisted):
     __tablename__ = 'VenueScores'
     score_id = Column(Integer, primary_key=True)
     venue_id = Column(Integer, ForeignKey('Venues.venue_id'))
-    score = Column(Integer, nullable=False)
+
+OperatorAirport = Table('OperatorAirport', Persisted.metadata,
+                        Column('operator_id', Integer, ForeignKey('operators.operator_id'), primary_key=True),
+                        Column('airport_id', Integer, ForeignKey('airports.airport_id'), primary_key=True),
+                        Column('name', Integer),
+                        )
+
+OperatorAirplane = Table('OperatorAirplane', Persisted.metadata,
+                         Column('operator_id', Integer, ForeignKey('operators.operator_id'), primary_key=True),
+                         Column('airplane_id', Integer, ForeignKey('airplanes.airplane_id'), primary_key=True),
+                         Column('name', Integer),
+                         )
 
 
-class Credentials(Persisted):
-    __tablename__ = 'Credentials'
-    credentials_id = Column(Integer, primary_key=True)
-    authority = Column(String(256), nullable=False)
-    port = Column(Integer, nullable=False)
-    database = Column(String(256), nullable=False)
-    username = Column(String(256), nullable=False)
-    password = Column(String(256), nullable=False)
-    weatherauthority = Column(String(256), nullable=False)
-    weatherport = Column(Integer, nullable=False)
-    apikey = Column(String(256), nullable=False)
+class Airplane(Persisted):
+    __tablename__ = 'airplanes'
+    airplane_id = Column(Integer, primary_key=True)
+    airplane_name = Column(String(256), nullable=False)
+    airplane_range = Column(Integer)
+    Operator = relationship('Operator', uselist=False, secondary=OperatorAirplane, back_populates='Airplane')
+
+
+class Airport(Persisted):
+    __tablename__ = 'airports'
+    airport_id = Column(Integer, primary_key=True)
+    airport_name = Column(String(256), nullable=False)
+    longitude = Column(Float(precision='4,2'))
+    latitude = Column(Float(precision='4,2'))
+    airport_ICAO = Column(String(256))
+    Operator = relationship('Operator', uselist=True, secondary=OperatorAirport, back_populates='Airport')
+
+
+class Operator(Persisted):
+    __tablename__ = 'operators'
+    operator_id = Column(Integer, primary_key=True)
+    operator_name = Column(String(256), nullable=False)
+    operator_rmp_score = Column(Integer)
+    Airport = relationship('Airport', uselist=True, secondary=OperatorAirport, back_populates='Operator')
+    Airplane = relationship('Airplane', uselist=False, secondary=OperatorAirplane, back_populates='Operator')
 
 
 class DealsDatabase(object):

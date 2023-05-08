@@ -26,6 +26,7 @@ class Venue(Persisted):
 
 class WeatherCondition(Persisted):
     __tablename__ = 'weather_conditions'
+    weather_id = Column(Integer, primary_key=True)
     venue_id = Column(Integer, ForeignKey('venues.venue_id', ondelete='CASCADE'), nullable=False)
     venue = relationship('Venue', uselist=True, back_populates='weather_conditions')
     condition_code = Column(Integer)
