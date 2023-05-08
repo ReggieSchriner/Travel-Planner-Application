@@ -4,7 +4,6 @@ from json import dumps
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.core.window import Window  # For inspection
-from kivy.lang import Builder
 from kivy.modules import inspector  # For inspection
 from kivy.uix.label import Label
 from kivy.uix.popup import Popup
@@ -56,13 +55,13 @@ class CredentialsWindow(Screen):
             self.ids.weatherport.text = weatherport
             self.ids.apikey.text = ''
         except FileNotFoundError:
-            self.popup_message.text = 'Credentials file not found in root directory'
+            self.popup_message.text = 'The credentials json was not found in root directory'
             self.popup.open()
         except KeyError:
-            self.popup_message.text = 'called field in json doesn\'t exist.\nCheck readme for documentation'
+            self.popup_message.text = 'The field you called in json does not exist.\nCheck the readme for correct documentation'
             self.popup.open()
         except IndexError:
-            self.popup_message.text = 'JSON file indices not set up correctly. \nCheck readme for documentation'
+            self.popup_message.text = 'JSON file was not set up correctly. \nCheck the readme for correct documentation'
 
     def submit_credentials(self):
         running_app = App.get_running_app()
@@ -141,6 +140,8 @@ class CredentialsWindow(Screen):
 
     # def on_enter(self, *args):
     #     self.add_credentials()
+
+
 class LoadingScreen(Screen):
     def on_enter(self):
         Clock.schedule_once(self.switch_to_next_screen, 2)
@@ -161,7 +162,7 @@ class UpdateRatingsPage(Screen):
     pass
 
 
-class WindowManager(ScreenManager):
+class MyScreenManager(ScreenManager):
     pass
 
 
@@ -177,12 +178,15 @@ class TravelPlannerApp(App):
         self.credentials_window = None
 
     def build(self):
-        inspector.create_inspector(Window, self)
-        kv = Builder.load_file("travel_planner.kv")
-        self.credentials_window = CredentialsWindow()
-        #self.credentials_window = kv.ids.credentials
-        # self.credentials_window.add_credentials()
-        return kv
+        screen_manager = MyScreenManager()
+        screen_manager.add_widget(CredentialsWindow(name='credentials'))
+        screen_manager.add_widget(LoadingScreen(name='loading_screen'))
+        screen_manager.add_widget(MainMenu(name='main_menu'))
+        screen_manager.add_widget(ValidateLocationsPage(name='validate_page'))
+        screen_manager.add_widget(UpdateRatingsPage(name='update_page'))
+        screen_manager.add_widget(ItineraryPage(name='itinerary_page'))
+        inspector.create_inspector(Window, self)  # For inspection (press control-e to toggle).
+        return screen_manager
 
     def construct_url(self, get_parameters=None):
         resource = 'forecast'

@@ -1,11 +1,45 @@
 from datetime import datetime, date, timedelta
 from sys import stderr
 from sqlalchemy.exc import SQLAlchemyError
-from database import Venues, DealsDatabase, Operators, Deals, Forecasts, VenueScores, OperatorScores, \
+from combined_database import Venues, DealsDatabase, Operators, Deals, Forecasts, VenueScores, OperatorScores, \
     Credentials
+from travel_planner_app.combined_database import Airport, Airplane, Operator
 
 
 def add_starter_data(session):
+    ORD = Airport(airport_name="ORD")
+    SAN = Airport(airport_name="SAN")
+    LAX = Airport(airport_name="LAX")
+    DEN = Airport(airport_name="DEN")
+    Bobcat = Airplane(airplane_name="Bobcat")
+    Coronado = Airplane(airplane_name="Coronado")
+    Dragon = Airplane(airplane_name="Dragon")
+    Windy = Airplane(airplane_name="Windy")
+    session.add(ORD)
+    session.add(SAN)
+    session.add(LAX)
+    session.add(DEN)
+    session.add(Bobcat)
+    session.add(Coronado)
+    session.add(Dragon)
+    session.add(Windy)
+
+    airport_one = Airport(airport_name='ORD', longitude=1.25530, latitude=2.64220, airport_ICAO='STCB')
+    session.add(airport_one)
+    airport_two = Airport(airport_name='SAN', longitude=1.022553, latitude=2.64220, airport_ICAO='AMDK')
+    session.add(airport_two)
+    operator_one = Operator(operator_name='Thunderbird', operator_rmp_score=9,
+                            Airport=[ORD, SAN, LAX], Airplane=Bobcat)
+    session.add(operator_one)
+    operator_two = Operator(operator_name='Lightning', operator_rmp_score=2,
+                            Airport=[ORD, DEN, LAX], Airplane=Dragon)
+    session.add(operator_two)
+
+    airplane_one = Airplane(airplane_name='Bobcat', airplane_range=700)
+    session.add(airplane_one)
+    airplane_two = Airplane(airplane_name='Windy', airplane_range=600)
+    session.add(airplane_two)
+
     # create venues
     olive_garden = Venues(name='Olive Garden', latitude=1, longitude=1, type='Restaurant', score=10)
     marcus_grand_cinema = Venues(name='Marcus Grand Cinema', latitude=1, longitude=1, type='Theater', score=8)
