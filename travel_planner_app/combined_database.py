@@ -1,4 +1,5 @@
-from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, Float
+import sqlalchemy
+from sqlalchemy import Table, create_engine, Column, Integer, String, ForeignKey, Float
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 
@@ -17,13 +18,35 @@ class Deals(Persisted):
 class Venues(Persisted):
     __tablename__ = 'Venues'
     venue_id = Column(Integer, primary_key=True)
-    name = Column(String(256), nullable=False)
+    venue_name = Column(String(256), nullable=False)
     latitude = Column(Float, nullable=False)
     longitude = Column(Float, nullable=False)
     type = Column(String(256), nullable=False)
-    score = Column(Integer)
+    venue_score = Column(Integer)
+    updated_venue_score = Column(Integer)
     deals = relationship("Deals", back_populates="venue")
     forecasts = relationship("Forecasts", back_populates="venue")
+
+
+class City(Persisted):
+    __tablename__ = 'cities'
+    city_id = Column(Integer, primary_key=True)
+    name = Column(String(256))
+    country = Column(String(256))
+    long = Column(Integer)  # divide by 10,0000 to get decimal.
+    lat = Column(Integer)  # ^
+    venues = relationship('Venue', uselist=True, back_populates='cities')
+
+
+class WeatherCondition(Persisted):
+    __tablename__ = 'weather_conditions'
+    weather_id = Column(Integer, primary_key=True)
+    venue_id = Column(Integer, ForeignKey('venues.venue_id', ondelete='CASCADE'), nullable=False)
+    venue = relationship('Venue', uselist=True, back_populates='weather_conditions')
+    condition_code = Column(Integer)
+    continuous_range = Column(String(256))
+    direction = Column(String(256))
+    threshold = Column(Integer)
 
 
 class Operators(Persisted):
@@ -54,13 +77,6 @@ class OperatorScores(Persisted):
     score = Column(Integer)
 
 
-class VenueScores(Persisted):
-    __tablename__ = 'VenueScores'
-    score_id = Column(Integer, primary_key=True)
-    venue_id = Column(Integer, ForeignKey('Venues.venue_id'))
-    score = Column(Integer, nullable=False)
-
-
 class Credentials(Persisted):
     __tablename__ = 'Credentials'
     credentials_id = Column(Integer, primary_key=True)
@@ -72,6 +88,56 @@ class Credentials(Persisted):
     weatherauthority = Column(String(256), nullable=False)
     weatherport = Column(Integer, nullable=False)
     apikey = Column(String(256), nullable=False)
+
+
+class ItineraryEntries(Persisted):
+    __tablename__ = 'ItineraryEntries'
+    entry_id = Column(Integer, primary_key=True)
+    itinerary_id = Column(Integer, nullable=False)
+    itinerary_selected = Column(sqlalchemy.Boolean, nullable=False)
+    day = Column(Integer, nullable=False)
+    city = Column(String(256), nullable=False)
+    venue = Column(String(256), nullable=False)
+
+
+OperatorAirport = Table('OperatorAirport', Persisted.metadata,
+                        Column('operator_id', Integer, ForeignKey('operators.operator_id'), primary_key=True),
+                        Column('airport_id', Integer, ForeignKey('airports.airport_id'), primary_key=True),
+                        Column('name', Integer),
+                        )
+
+OperatorAirplane = Table('OperatorAirplane', Persisted.metadata,
+                         Column('operator_id', Integer, ForeignKey('operators.operator_id'), primary_key=True),
+                         Column('airplane_id', Integer, ForeignKey('airplanes.airplane_id'), primary_key=True),
+                         Column('name', Integer),
+                         )
+
+
+class Airplane(Persisted):
+    __tablename__ = 'airplanes'
+    airplane_id = Column(Integer, primary_key=True)
+    airplane_name = Column(String(256), nullable=False)
+    airplane_range = Column(Integer)
+    Operator = relationship('Operator', uselist=False, secondary=OperatorAirplane, back_populates='Airplane')
+
+
+class Airport(Persisted):
+    __tablename__ = 'airports'
+    airport_id = Column(Integer, primary_key=True)
+    airport_name = Column(String(256), nullable=False)
+    longitude = Column(Float(precision='4,2'))
+    latitude = Column(Float(precision='4,2'))
+    airport_ICAO = Column(String(256))
+    Operator = relationship('Operator', uselist=True, secondary=OperatorAirport, back_populates='Airport')
+
+
+class Operator(Persisted):
+    __tablename__ = 'operators'
+    operator_id = Column(Integer, primary_key=True)
+    operator_name = Column(String(256), nullable=False)
+    operator_rmp_score = Column(Integer)
+    Airport = relationship('Airport', uselist=True, secondary=OperatorAirport, back_populates='Operator')
+    Airplane = relationship('Airplane', uselist=False, secondary=OperatorAirplane, back_populates='Operator')
 
 
 class DealsDatabase(object):
@@ -86,6 +152,9 @@ class DealsDatabase(object):
 
     def ensure_tables_exist(self):
         Persisted.metadata.create_all(self.engine)
+
+    def drop_all_tables(self):
+        Persisted.metadata.drop_all(self.engine)
 
     def create_session(self):
         return self.Session()
