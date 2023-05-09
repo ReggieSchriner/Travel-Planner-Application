@@ -14,7 +14,7 @@
 
 1. Travel Planner App
 
-2. Package Deal Tracker App - The app is almost fully functional with no known bugs. The app works perfectly with the database and add/pull information as expected. The only part of the functionality that needs to be added is the review itinerary screen. Furthermore, the app has multiple test cases that test the use of the database, all of which pass.
+2. Package Deal Tracker App - The app is almost mostly functional, only missing the review itinerary screen, with no known bugs. The app works perfectly with the database and add/pull information as expected. The only part of the functionality that needs to be added is the review itinerary screen. Furthermore, the app has multiple test cases that test the use of the database, all of which pass. The only methods that do not have tests are the submit_score and review_itinerary methods. 
 
 3. Entertainment Tracker App
 
@@ -39,8 +39,11 @@
     After running the installer, creating the database, and adding your credentials, the main app can be used by 
     running the main.py file. Then the GUI can be used to interact with and access the rest of the app. 
 
-    To use the unit tests, run the test_installer.py file and then the tests.py file will function as expected. As 
-    you will see, all tests are passing and each test check the functionality of the methods that interact with the
-    database by using a local databse to run the tests.
+    In order to make the tests function, create a database called 'deals_test' by using the command: 'mysql 
+    --protocol=TCP --port=3306 --user=root -p' in you terminal and then typing the password. Then type 'create
+    database deals_test' to create the database so that the unit tests can run and store information.
+    Then to use the unit tests, run the test_installer.py file and then the tests.py file will function as 
+    expected. As you will see, all tests are passing and each test check the functionality of the methods that 
+    interact with the database by using a local databse to run the tests.
 
 3. Entertainment Tracker App
