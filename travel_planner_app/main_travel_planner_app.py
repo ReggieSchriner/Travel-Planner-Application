@@ -103,10 +103,10 @@ class TravelPlannerApp(App):
             # self.root.ids.port.text = port
             # self.root.ids.database.text = database
             # self.root.ids.username.text = username
-            self.root.ids.password.text = ''
-            self.root.ids.weatherauthority.text = weatherauthority
-            self.root.ids.weatherport.text = weatherport
-            self.root.ids.apikey.text = ''
+            # self.root.ids.password.text = ''
+            # self.root.ids.weatherauthority.text = weatherauthority
+            # self.root.ids.weatherport.text = weatherport
+            # self.root.ids.apikey.text = ''
 
         except FileNotFoundError:
             self.popup_message.text = 'The credentials json was not found in root directory'
