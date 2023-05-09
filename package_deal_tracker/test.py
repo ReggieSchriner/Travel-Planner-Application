@@ -1,6 +1,12 @@
+from datetime import datetime
 from unittest import TestCase
-from package_deal_tracker.database import Venues, DealsDatabase, Operators
-from package_deal_tracker.main import NewVenue, AddEditOperator, EditOperator
+
+from kivy.uix.spinner import Spinner, SpinnerOption
+from requests import patch
+
+from package_deal_tracker.database import Venues, DealsDatabase, Operators, Forecasts, OperatorScores, VenueScores, \
+    Deals
+from package_deal_tracker.main import NewVenue, AddEditOperator, EditOperator, CheckForecast, SubmitReview
 from kivy.app import App
 
 
@@ -40,28 +46,65 @@ class TestAddEditOperator(TestCase):
         self.assertEqual(added_operator.name, 'Test Operator')
         self.assertEqual(added_operator.rate_my_pilot_score, 5)
 
-class TestEditOperator(TestCase):
+
+class TestCheckForecast(TestCase):
     def setUp(self):
         # Set up the App instance
         url = DealsDatabase.construct_mysql_url('localhost', 3306, 'deals_test', 'root', 'cse1208')
         self.deals_database = DealsDatabase(url)
         self.session = self.deals_database.create_session()
-        App.get_running_app = lambda: self
-        self.edit_operator = EditOperator()
+        self.app = App()
+        App.get_running_app = lambda: self.app
+        self.check_forecast = CheckForecast()
 
-    def test_submit_operator(self):
+        # Add a mock implementation of the execute_query method to the app object
+        self.app.execute_query = lambda query: [[0]]
+    def test_get_forecast(self):
         # Set up test data
-        operator = Operators(name='Test Operator Edit', rate_my_pilot_score=10)
-        self.session.add(operator)
+        venue = 'Test Venue'
+        date = '2022-01-01'
+
+        self.session.query(Forecasts).filter(Forecasts.forecast_id == 100).delete()
         self.session.commit()
 
-        # Call the submit_operator method with the test operator
-        self.edit_operator.submit_operator(operator=operator, name='Test Operator Edit', new_name='new name', score=1.0)
+        # Insert test data into the Forecasts table
+        forecast_id = 100
+        venue_id = 1
+        date_time = f"{date} 12:00:00"
+        temperature = 70.0
+        feels_like = 75.0
+        humidity = 50.0
+        wind_speed = 10.0
+        rain = 20.0
+        forecast = Forecasts(forecast_id=forecast_id, venue_id=venue_id, date_time=date_time,
+                             temperature=temperature, feels_like=feels_like, humidity=humidity,
+                             wind_speed=wind_speed, rain=rain)
+        self.session.add(forecast)
+        self.session.commit()
 
-        # Check that the operator was added to the database
-        edited_operator = self.session.query(Operators).filter_by(name='new name').first()
-        self.assertIsNotNone(edited_operator)
+        # Create dummy objects for the venue and date values
+        venue_spinner = type('', (), {'text': venue})()
+        date_spinner = type('', (), {'text': date})()
 
-        # Check that the entered data matches the data in the database
-        self.assertEqual(edited_operator.name, 'new name')
-        self.assertEqual(edited_operator.rate_my_pilot_score, 1.0)
+        # Set up the expected forecast as a dictionary with the test data values
+        expected_forecast = {
+            "date_time": date_time,
+            "temperature": temperature,
+            "feels_like": feels_like,
+            "humidity": humidity,
+            "wind_speed": wind_speed,
+            "rain": rain
+        }
+
+        # Call the get_forecast method on an instance of the CheckForecast class and pass in the test data, dummy objects, and app object
+        forecast = self.check_forecast.get_forecast(date=date, venue=venue, venue_spinner=venue_spinner, date_spinner=date_spinner, app=self.app, forecast={
+            "date_time": date_time,
+            "temperature": temperature,
+            "feels_like": feels_like,
+            "humidity": humidity,
+            "wind_speed": wind_speed,
+            "rain": rain
+        })
+
+        # Check if the returned forecast matches the expected forecast
+        self.assertEqual(forecast, expected_forecast)

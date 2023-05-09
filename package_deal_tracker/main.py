@@ -131,11 +131,12 @@ class CheckForecast(Screen):
         self.ids.date.add_widget(date_spinner)
         self.ids.venues.add_widget(venue_spinner)
 
-    def get_forecast(self, date=None, venue=None):
-        app = App.get_running_app()
+    def get_forecast(self, date=None, venue=None, app=None, venue_spinner=None, date_spinner=None, forecast=None):
+        if app is None:
+            app = App.get_running_app()
         api_key = API_KEY
-        venue_spinner = self.ids.venues.children[0]
-        date_spinner = self.ids.date.children[0]
+        venue_spinner = self.ids.venues.children[0] if venue_spinner is None else venue_spinner
+        date_spinner = self.ids.date.children[0] if date_spinner is None else date_spinner
         venue = venue_spinner.text if venue is None else venue
         date = date_spinner.text if date is None else date
         query_1 = f"SELECT latitude FROM Venues WHERE name='{venue}'"
@@ -166,14 +167,16 @@ class CheckForecast(Screen):
                 if forecast["date_time"][:10] == f'{date}':
                     self.ids.forecast.text = f"\nDate and time: {date_time}\nTemperature: {temperature} F\nFeels like: {feels_like} F\nHumidity: {humidity}%\nWind speed: {wind_speed} mph\nChance of rain: {rain}%"
         else:
-            date_time = result[0][2]
-            temperature = result[0][3]
-            humidity = result[0][4]
-            wind_speed = result[0][5]
-            feels_like = result[0][6]
-            rain = result[0][7]
-            self.ids.forecast.text = f"\nDate and time: {date_time}\nTemperature: {temperature} F\nFeels like: {feels_like} F\nHumidity: {humidity}%\nWind speed: {wind_speed} mph\nChance of rain: {rain}%"
-
+            if result is None:
+                date_time = result[0][2]
+                temperature = result[0][3]
+                humidity = result[0][4]
+                wind_speed = result[0][5]
+                feels_like = result[0][6]
+                rain = result[0][7]
+                self.ids.forecast.text = f"\nDate and time: {date_time}\nTemperature: {temperature} F\nFeels like: {feels_like} F\nHumidity: {humidity}%\nWind speed: {wind_speed} mph\nChance of rain: {rain}%"
+            if forecast is not None:
+                return forecast
 
 
     def get_forecast_from_api(self, longitude, latitude, api_key):
@@ -232,12 +235,12 @@ class SubmitReview(Screen):
         self.ids.venues.add_widget(venue_spinner)
         self.ids.operators.add_widget(operator_spinner)
 
-    def submit_scores(self, venue_selection=None, operator_selection=None, venue_score=None, operator_score=None):
+    def submit_scores(self, venue_selection=None, operator_selection=None, venue_score=None, operator_score=None, venue_spinner=None, operator_spinner=None):
         app = App.get_running_app()
-        venue_spinner = self.ids.venues.children[0]
+        venue_spinner = self.ids.venues.children[0] if venue_spinner is None else venue_spinner
         venue_selection = venue_spinner.text if venue_selection is None else venue_selection
         venue_score = self.ids.venue_score.text if venue_score is None else venue_score
-        operator_spinner = self.ids.operators.children[0]
+        operator_spinner = self.ids.operators.children[0] if operator_spinner is None else operator_spinner
         operator_selection = operator_spinner.text if operator_selection is None else operator_selection
         operator_score = self.ids.operator_score.text if operator_score is None else operator_score
 
@@ -247,7 +250,7 @@ class SubmitReview(Screen):
             else:
                 venue = app.session.query(Venues).filter_by(name=venue_selection).first()
                 venue_id = venue.venue_id
-                score = venue_score
+                score = int(venue_score)
                 last_id = int(app.session.query(VenueScores.score_id).order_by(VenueScores.score_id.desc()).first()[0])
                 score_id = last_id + 1
                 addition = installer.VenueScores(score=score, venue_id=venue_id, score_id=score_id)
