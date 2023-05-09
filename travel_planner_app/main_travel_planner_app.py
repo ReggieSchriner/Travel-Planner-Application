@@ -108,9 +108,8 @@ class TravelPlannerApp(App):
             # self.root.ids.weatherport.text = weatherport
             # self.root.ids.apikey.text = ''
 
-        except FileNotFoundError:
-            self.popup_message.text = 'The credentials json was not found in root directory'
-            self.popup.open()
+        # except FileNotFoundError:
+            # self.ids.message.text = 'The credentials json was not found in root directory'
         except KeyError:
             self.popup_message.text = 'The field you called in json does not exist.\nCheck the readme for correct documentation'
             self.popup.open()
