@@ -28,9 +28,9 @@
     Instructions for this can be found here: https://computing.unl.edu/faq-section/working-remotely/#node-302
 
     Next, create a file called 'credentials.json' in the same folder and enter the following dictionary with your 
-    user credentials filled in where the varibles are surrounded with < > (be sure to enter them as strings 
-    sourrounded with ""): 
-    {"authority":"cse.unl.edu", "port":3306,"database":<databse>,"username":<username>,"password":<password>}.
+    user credentials filled in where the varibles are surrounded with ** (be sure to enter them as strings 
+    sourrounded with quotations): 
+    {"authority":"cse.unl.edu", "port":3306,"database":*databse*,"username":*username*,"password":*password*}.
 
     Then open the app folder in PyCharm and locate the installer file (not the test installer). Run 
     the installer and make sure the tables and database are created. This is shown by the print statements that 
