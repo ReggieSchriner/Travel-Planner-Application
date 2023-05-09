@@ -1,15 +1,52 @@
-from datetime import datetime, date, timedelta
+from datetime import datetime, timedelta
 from sys import stderr
+
 from sqlalchemy.exc import SQLAlchemyError
-from database import Venues, DealsDatabase, Operators, Deals, Forecasts, VenueScores, OperatorScores, \
+
+from combined_database import Venues, DealsDatabase, Operators, Deals, Forecasts, OperatorScores, \
     Credentials
+from entertainment_tracker.entertainment import Venue, City, WeatherCondition
+from travel_planner_app.combined_database import Airport, Airplane, Operator
 
 
 def add_starter_data(session):
+    ORD = Airport(airport_name="ORD")
+    SAN = Airport(airport_name="SAN")
+    LAX = Airport(airport_name="LAX")
+    DEN = Airport(airport_name="DEN")
+    Bobcat = Airplane(airplane_name="Bobcat")
+    Coronado = Airplane(airplane_name="Coronado")
+    Dragon = Airplane(airplane_name="Dragon")
+    Windy = Airplane(airplane_name="Windy")
+    session.add(ORD)
+    session.add(SAN)
+    session.add(LAX)
+    session.add(DEN)
+    session.add(Bobcat)
+    session.add(Coronado)
+    session.add(Dragon)
+    session.add(Windy)
+
+    airport_one = Airport(airport_name='ORD', longitude=1.25530, latitude=2.64220, airport_ICAO='STCB')
+    session.add(airport_one)
+    airport_two = Airport(airport_name='SAN', longitude=1.022553, latitude=2.64220, airport_ICAO='AMDK')
+    session.add(airport_two)
+    operator_one = Operator(operator_name='Thunderbird', operator_rmp_score=9,
+                            Airport=[ORD, SAN, LAX], Airplane=Bobcat)
+    session.add(operator_one)
+    operator_two = Operator(operator_name='Lightning', operator_rmp_score=2,
+                            Airport=[ORD, DEN, LAX], Airplane=Dragon)
+    session.add(operator_two)
+
+    airplane_one = Airplane(airplane_name='Bobcat', airplane_range=700)
+    session.add(airplane_one)
+    airplane_two = Airplane(airplane_name='Windy', airplane_range=600)
+    session.add(airplane_two)
+
     # create venues
-    olive_garden = Venues(name='Olive Garden', latitude=1, longitude=1, type='Restaurant', score=10)
-    marcus_grand_cinema = Venues(name='Marcus Grand Cinema', latitude=1, longitude=1, type='Theater', score=8)
-    pinnacle_bank_arena = Venues(name='Pinnacle Bank Arena', latitude=1, longitude=1, type='Sports Arena', score=7)
+    olive_garden = Venues(venue_name='Olive Garden', latitude=1, longitude=1, type='Restaurant', score=10)
+    marcus_grand_cinema = Venues(venue_name='Marcus Grand Cinema', latitude=1, longitude=1, type='Theater', venue_score=8, updated_venue_score = 9)
+    pinnacle_bank_arena = Venues(venue_name='Pinnacle Bank Arena', latitude=1, longitude=1, type='Sports Arena', venue_score=7, updated_venue_score = 8)
     session.add_all([olive_garden, marcus_grand_cinema, pinnacle_bank_arena])
     session.commit()
 
@@ -46,12 +83,41 @@ def add_starter_data(session):
     session.add_all([olive_garden_deal, marcus_grand_cinema_deal, pinnacle_bank_arena_deal, olive_garden_deal2])
     session.commit()
 
-    # create venue scores
-    olive_garden_score = VenueScores(venue_id=1, score=1)
-    marcus_grand_cinema_score = VenueScores(venue_id=2, score=2)
-    pinnacle_bank_arena_score = VenueScores(venue_id=3, score=3)
-    session.add_all([olive_garden_score, marcus_grand_cinema_score, pinnacle_bank_arena_score])
-    session.commit()
+    omaha = City(name='Omaha', country='United States', lat=412565, long=959345)
+    cafe = Venue(name='Garden Cafe', city=omaha, type='Indoor Restaurant')
+    movie_theater = Venue(name='AMC', city=omaha, type='Indoor Theater')
+    arena = Venue(name='Baxter Arena', city=omaha, type='Indoor Sports Arena')
+
+    new_york = City(name='New York', country='United States', lat=407128, long=740060)
+    restaurant = Venue(name='Fogo De Chao', city=new_york, type='Indoor Restaurant')
+    theater = Venue(name='drive-in', city=new_york, type='Outdoor Theater')
+    stadium = Venue(name='UBS Arena', city=new_york, type='Outdoor Sports Arena')
+
+    snow = WeatherCondition(condition_code=622, venue=cafe)
+    thunder = WeatherCondition(condition_code=202, venue=stadium)
+    drizzle = WeatherCondition(condition_code=312, venue=theater)
+    rain = WeatherCondition(condition_code=504)
+    atmosphere = WeatherCondition(condition_code=781, venue=movie_theater)
+    clear = WeatherCondition(condition_code=800)
+    clouds = WeatherCondition(condition_code=804)
+    wind = WeatherCondition(continuous_range='Wind Speed', direction='above', threshold=24)
+
+    session.add(omaha)
+    session.add(cafe)
+    session.add(movie_theater)
+    session.add(arena)
+    session.add(new_york)
+    session.add(restaurant)
+    session.add(theater)
+    session.add(stadium)
+    session.add(snow)
+    session.add(thunder)
+    session.add(drizzle)
+    session.add(rain)
+    session.add(atmosphere)
+    session.add(clear)
+    session.add(clouds)
+    session.add(wind)
 
     # create operator scores
     operator_1_score = OperatorScores(score=1, score_id=1, operator_id=1)

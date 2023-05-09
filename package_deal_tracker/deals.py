@@ -1,5 +1,5 @@
-import sqlalchemy
-from sqlalchemy import Table, create_engine, Column, Integer, String, ForeignKey, Float
+from sqlalchemy import Table
+from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, Float
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 
@@ -18,35 +18,13 @@ class Deals(Persisted):
 class Venues(Persisted):
     __tablename__ = 'Venues'
     venue_id = Column(Integer, primary_key=True)
-    venue_name = Column(String(256), nullable=False)
+    name = Column(String(256), nullable=False)
     latitude = Column(Float, nullable=False)
     longitude = Column(Float, nullable=False)
     type = Column(String(256), nullable=False)
-    venue_score = Column(Integer)
-    updated_venue_score = Column(Integer)
+    score = Column(Integer, nullable=False)
     deals = relationship("Deals", back_populates="venue")
     forecasts = relationship("Forecasts", back_populates="venue")
-
-
-class City(Persisted):
-    __tablename__ = 'cities'
-    city_id = Column(Integer, primary_key=True)
-    name = Column(String(256))
-    country = Column(String(256))
-    long = Column(Integer)  # divide by 10,0000 to get decimal.
-    lat = Column(Integer)  # ^
-    venues = relationship('Venue', uselist=True, back_populates='cities')
-
-
-class WeatherCondition(Persisted):
-    __tablename__ = 'weather_conditions'
-    weather_id = Column(Integer, primary_key=True)
-    venue_id = Column(Integer, ForeignKey('venues.venue_id', ondelete='CASCADE'), nullable=False)
-    venue = relationship('Venue', uselist=True, back_populates='weather_conditions')
-    condition_code = Column(Integer)
-    continuous_range = Column(String(256))
-    direction = Column(String(256))
-    threshold = Column(Integer)
 
 
 class Operators(Persisted):
@@ -61,49 +39,23 @@ class Forecasts(Persisted):
     __tablename__ = 'Forecasts'
     forecast_id = Column(Integer, primary_key=True)
     venue_id = Column(Integer, ForeignKey('Venues.venue_id'))
-    date_time = Column(String(256), nullable=False)
+    date = Column(String(256), nullable=False)
     temperature = Column(Float, nullable=False)
     humidity = Column(Float, nullable=False)
     wind_speed = Column(Float, nullable=False)
     feels_like = Column(Float, nullable=False)
-    rain = Column(Float, nullable=False)
+    precipitation = Column(Float, nullable=False)
     venue = relationship("Venues", back_populates="forecasts")
-
 
 class OperatorScores(Persisted):
     __tablename__ = 'OperatorScores'
     score_id = Column(Integer, primary_key=True)
     operator_id = Column(Integer, ForeignKey('Operators.operator_id'))
-    score = Column(Integer)
 
-
-class Reviews(Persisted):
-    __tablename__ = 'Reviews'
-    reviews_id = Column(String(256), primary_key=True)
-
-
-class Credentials(Persisted):
-    __tablename__ = 'Credentials'
-    credentials_id = Column(Integer, primary_key=True)
-    authority = Column(String(256), nullable=False)
-    port = Column(Integer, nullable=False)
-    database = Column(String(256), nullable=False)
-    username = Column(String(256), nullable=False)
-    password = Column(String(256), nullable=False)
-    weatherauthority = Column(String(256), nullable=False)
-    weatherport = Column(Integer, nullable=False)
-    apikey = Column(String(256), nullable=False)
-
-
-class ItineraryEntries(Persisted):
-    __tablename__ = 'ItineraryEntries'
-    entry_id = Column(Integer, primary_key=True)
-    itinerary_id = Column(Integer, nullable=False)
-    itinerary_selected = Column(sqlalchemy.Boolean, nullable=False)
-    day = Column(Integer, nullable=False)
-    city = Column(String(256), nullable=False)
-    venue = Column(String(256), nullable=False)
-
+class VenueScore(Persisted):
+    __tablename__ = 'VenueScores'
+    score_id = Column(Integer, primary_key=True)
+    venue_id = Column(Integer, ForeignKey('Venues.venue_id'))
 
 OperatorAirport = Table('OperatorAirport', Persisted.metadata,
                         Column('operator_id', Integer, ForeignKey('operators.operator_id'), primary_key=True),
@@ -157,9 +109,6 @@ class DealsDatabase(object):
 
     def ensure_tables_exist(self):
         Persisted.metadata.create_all(self.engine)
-
-    def drop_all_tables(self):
-        Persisted.metadata.drop_all(self.engine)
 
     def create_session(self):
         return self.Session()

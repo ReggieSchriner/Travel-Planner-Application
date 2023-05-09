@@ -1,11 +1,11 @@
-WindowManager:
+ScreenManager:
     CredentialsWindow:
     LoadingScreen:
     MainMenu:
     ValidateLocationsPage:
     UpdateRatingsPage:
     ItineraryPage:
-
+ 
 <CredentialsWindow>
     name: 'credentials'
     BoxLayout:
@@ -38,6 +38,7 @@ WindowManager:
                         width: 1.2
                         rectangle: self.x, self.y, self.width, self.height
                 Label:
+                    id: remote
                     text: 'Remote Database'
                     font_size: sp(22)
                     underline: True
@@ -48,8 +49,9 @@ WindowManager:
                     text: "Enter authority:"
                 TextInput:
                     id: authority
-                    size_hint: 1, .65
+                    size_hint: 1, .85
                     pos_hint: {'center_x': .5, 'center_y': .5}
+                    text: "unl.cse.edu"
                 Label:
                     font_size: sp(22)
                     size_hint: .5, .5
@@ -57,8 +59,9 @@ WindowManager:
                     text: "Enter in port number:"
                 TextInput:
                     id: port
-                    size_hint: 1, .65
+                    size_hint: 1, .85
                     pos_hint: {'center_x': .5, 'center_y': .5}
+                    text: "3306"
                 Label:
                     font_size: sp(22)
                     size_hint: .5, .5
@@ -66,8 +69,9 @@ WindowManager:
                     text: "Enter database name:"
                 TextInput:
                     id: database
-                    size_hint: 1, .7
+                    size_hint: 1, .85
                     pos_hint: {'center_x': .5, 'center_y': .5}
+                    text: "zridha"
                 Label:
                     font_size: sp(22)
                     size_hint: .5, .5
@@ -75,15 +79,17 @@ WindowManager:
                     text: "Enter username:"
                 TextInput:
                     id: username
-                    size_hint: 1, .65
+                    size_hint: 1, .85
                     pos_hint: {'center_x': .5, 'center_y': .5}
+                    text: "zridha"
                 Label:
+                    text: "Enter password:"
                     font_size: sp(22)
                     size_hint: .5, .5
                     pos_hint: {'center_x': .5, 'center_y': 1}
                 TextInput:
                     id: password
-                    size_hint: 1, .65
+                    size_hint: 1, .85
                     pos_hint: {'center_x': .5, 'center_y': .5}
                     password: True
             BoxLayout:
@@ -109,8 +115,9 @@ WindowManager:
                     text: "Enter authority:"
                 TextInput:
                     id: weatherauthority
-                    size_hint: 1, .65
+                    size_hint: 1, .75
                     pos_hint: {'center_x': .5, 'center_y': .5}
+                    text: "api.openweathermap.org"
                 Label:
                     font_size: sp(22)
                     size_hint: .5, .5
@@ -118,8 +125,9 @@ WindowManager:
                     text: "Enter in port number:"
                 TextInput:
                     id: weatherport
-                    size_hint: 1, .65
+                    size_hint: 1, .75
                     pos_hint: {'center_x': .5, 'center_y': .5}
+                    text: "443"
                 Label:
                     font_size: sp(22)
                     size_hint: .5, .5
@@ -127,8 +135,9 @@ WindowManager:
                     text: "Enter API key:"
                 TextInput:
                     id: apikey
-                    size_hint: 1, .65
+                    size_hint: 1, .75
                     pos_hint: {'center_x': .5, 'center_y': .5}
+                    text: ""
         BoxLayout:
             orientation: 'vertical'
             size_hint: 1, .18
@@ -146,8 +155,9 @@ WindowManager:
                 pos_hint: {'center_x': .5}
                 text: 'Submit'
                 font_size: sp(22)
-                on_press: app.credentials_window.submit_credentials()
+                on_release: app.root.current = 'loading_screen'
 
+ 
 <LoadingScreen>
     name: 'loading_screen'
     BoxLayout:
@@ -168,7 +178,7 @@ WindowManager:
                 pos_hint: {'center_x': .5}
                 bold: True
                 text: 'Loading...'
-
+ 
 <MainMenu>
     name: 'main_menu'
     BoxLayout:
@@ -250,7 +260,7 @@ WindowManager:
                 text: 'Exit App'
                 font_size: sp(22)
                 on_press: quit()
-
+ 
 <ValidateLocationsPage>
     name: 'validate_page'
     BoxLayout:
@@ -322,7 +332,7 @@ WindowManager:
                 text: 'Back to Main Menu'
                 font_size: sp(22)
                 on_release: app.root.current = 'main_menu'
-
+ 
 <UpdateRatingsPage>
     name: 'update_page'
     BoxLayout:
@@ -333,33 +343,107 @@ WindowManager:
                 pos: self.pos
                 size: self.size
         orientation: 'vertical'
+        size_hint: 1, .25
+        Label:
+            rgba: (217, 162, 190, 0.8)
+            font_size: sp(40)
+            size_hint: .5, .5
+            pos_hint: {'center_x': .5}
+            bold: True
+            text: 'Update Ratings Page'
+    BoxLayout:
+        orientation: 'vertical'
+        size_hint: 1, .25
+    BoxLayout:
+        orientation: 'vertical'
+    BoxLayout:
+        orientation: 'vertical'
+        size_hint: 1, .5
+        padding: 40
+        spacing:
+        Label:
+            text: ' '
+            size_hint: (0.25, 1)
+    BoxLayout:
+        orientation: 'vertical'
         BoxLayout:
-            orientation: 'vertical'
-            size_hint: 1, .25
+            orientation: 'horizontal'
             Label:
-                rgba: (217, 162, 190, 0.8)
-                font_size: sp(40)
-                size_hint: .5, .5
-                pos_hint: {'center_x': .5}
-                bold: True
-                text: 'Update Ratings Page'
+                text: 'Current Score'
+                size_hint: (0.65, 0.95)
+                font_size: sp(15)
+
+            Label:
+                text: 'Updated Score'
+                size_hint: (0.65, 0.95)
+                font_size: sp(15)
+        BoxLayout:
+            orientation: 'horizontal'
+            ScrollView:
+                Label:
+                    text: root.rated_venue1
+                    id: rated_venue1
+                    size_hint: (1.2, 0.55)
+                    font_size: sp(16)
+            ScrollView:
+                Label:
+                    text: root.rated_venue2
+                    id: rated_venue2
+                    size_hint: (0.95, 0.55)
+                    font_size: sp(16)
+        Label:
+            text: 'Name of the venue to accept the score of:'
+            size_hint: (0.50, 0.25)
+            font_size: sp(12)
+        TextInput:
+            id: accepted_venues
+            multiline: False
+            write_tab: False
+            on_text_validate: password.focus = True
+            size_hint: (0.6, 0.40)
+        Label:
+            text: 'Name of the venue to reject the score of:'
+            size_hint: (0.50, 0.25)
+            font_size: sp(12)
+        TextInput:
+            id: rejected_venues
+            multiline: False
+            write_tab: False
+            on_text_validate: password.focus = True
+            size_hint: (0.6, 0.40)
+        Label:
+            text: 'the average score is: '
+            id: show_yet_another_venue_score
+            size_hint: (0.95, 0.55)
+            font_size: sp(25)
+        Label:
+            text: root.average_score
+            id: average_score
+            size_hint: (0.95, 0.55)
+            font_size: sp(25)
+
+
         BoxLayout:
             orientation: 'vertical'
-            size_hint: 1, .25
-        BoxLayout:
-            orientation: 'vertical'
-        BoxLayout:
-            orientation: 'vertical'
-            size_hint: 1, .5
-            padding: 40
-            spacing: 10
-            Button:
-                background_color:(.5, .1, .2, 0.9)
-                size_hint: .35, 1
-                pos_hint: {'center_x': .5}
-                text: 'Back to Main Menu'
-                font_size: sp(22)
-                on_release: app.root.current = 'main_menu'
+            BoxLayout:
+                orientation: 'horizontal'
+        Button:
+            text: 'submit'
+            size_hint: (0.4, 0.5)
+            on_press: app.manage_scores(accepted_venues.text, rejected_venues.text)
+
+        Button:
+            text: 'show updated Ratings and\n current average score'
+            size_hint: (0.4, 0.5)
+            on_press: app.update_ratings()
+
+        Button:
+            background_color:(.5, .1, .2, 0.9)
+            size_hint: .35, 1
+            pos_hint: {'center_x': .5}
+            text: 'Back to Main Menu'
+            font_size: sp(22)
+            on_release: app.root.current = 'main_menu'
 
 <ItineraryPage>
     name: 'itinerary_page'
