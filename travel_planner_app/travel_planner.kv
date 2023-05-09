@@ -38,6 +38,7 @@ ScreenManager:
                         width: 1.2
                         rectangle: self.x, self.y, self.width, self.height
                 Label:
+                    id: remote
                     text: 'Remote Database'
                     font_size: sp(22)
                     underline: True
@@ -48,8 +49,9 @@ ScreenManager:
                     text: "Enter authority:"
                 TextInput:
                     id: authority
-                    size_hint: 1, .65
+                    size_hint: 1, .85
                     pos_hint: {'center_x': .5, 'center_y': .5}
+                    text: "unl.cse.edu"
                 Label:
                     font_size: sp(22)
                     size_hint: .5, .5
@@ -57,8 +59,9 @@ ScreenManager:
                     text: "Enter in port number:"
                 TextInput:
                     id: port
-                    size_hint: 1, .65
+                    size_hint: 1, .85
                     pos_hint: {'center_x': .5, 'center_y': .5}
+                    text: "3306"
                 Label:
                     font_size: sp(22)
                     size_hint: .5, .5
@@ -66,8 +69,9 @@ ScreenManager:
                     text: "Enter database name:"
                 TextInput:
                     id: database
-                    size_hint: 1, .7
+                    size_hint: 1, .85
                     pos_hint: {'center_x': .5, 'center_y': .5}
+                    text: "zridha"
                 Label:
                     font_size: sp(22)
                     size_hint: .5, .5
@@ -75,8 +79,9 @@ ScreenManager:
                     text: "Enter username:"
                 TextInput:
                     id: username
-                    size_hint: 1, .65
+                    size_hint: 1, .85
                     pos_hint: {'center_x': .5, 'center_y': .5}
+                    text: "zridha"
                 Label:
                     text: "Enter password:"
                     font_size: sp(22)
@@ -84,7 +89,7 @@ ScreenManager:
                     pos_hint: {'center_x': .5, 'center_y': 1}
                 TextInput:
                     id: password
-                    size_hint: 1, .65
+                    size_hint: 1, .85
                     pos_hint: {'center_x': .5, 'center_y': .5}
                     password: True
             BoxLayout:
@@ -110,8 +115,9 @@ ScreenManager:
                     text: "Enter authority:"
                 TextInput:
                     id: weatherauthority
-                    size_hint: 1, .65
+                    size_hint: 1, .75
                     pos_hint: {'center_x': .5, 'center_y': .5}
+                    text: "api.openweathermap.org"
                 Label:
                     font_size: sp(22)
                     size_hint: .5, .5
@@ -119,8 +125,9 @@ ScreenManager:
                     text: "Enter in port number:"
                 TextInput:
                     id: weatherport
-                    size_hint: 1, .65
+                    size_hint: 1, .75
                     pos_hint: {'center_x': .5, 'center_y': .5}
+                    text: "443"
                 Label:
                     font_size: sp(22)
                     size_hint: .5, .5
@@ -128,8 +135,9 @@ ScreenManager:
                     text: "Enter API key:"
                 TextInput:
                     id: apikey
-                    size_hint: 1, .65
+                    size_hint: 1, .75
                     pos_hint: {'center_x': .5, 'center_y': .5}
+                    text: ""
         BoxLayout:
             orientation: 'vertical'
             size_hint: 1, .18

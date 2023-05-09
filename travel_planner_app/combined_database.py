@@ -77,6 +77,11 @@ class OperatorScores(Persisted):
     score = Column(Integer)
 
 
+class Reviews(Persisted):
+    __tablename__ = 'Reviews'
+    reviews_id = Column(String(256), primary_key=True)
+
+
 class Credentials(Persisted):
     __tablename__ = 'Credentials'
     credentials_id = Column(Integer, primary_key=True)
