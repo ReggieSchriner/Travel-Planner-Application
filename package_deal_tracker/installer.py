@@ -60,6 +60,7 @@ def add_starter_data(session):
     session.commit()
 
 
+
 def main():
     try:
         f = open('credentials.json')

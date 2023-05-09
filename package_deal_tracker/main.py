@@ -244,6 +244,7 @@ class SubmitReview(Screen):
         operator_selection = operator_spinner.text if operator_selection is None else operator_selection
         operator_score = self.ids.operator_score.text if operator_score is None else operator_score
 
+
         if venue_selection != 'Select a venue':
             if venue_score.isspace() or venue_score == '':
                 self.ids.message.text = 'Please enter a venue score'
