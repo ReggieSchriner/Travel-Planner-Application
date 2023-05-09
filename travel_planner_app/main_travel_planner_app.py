@@ -132,9 +132,9 @@ class TravelPlannerApp(App):
                 layout.message.text = 'Fill in all text boxes'
                 print(layout.message.text)
                 layout.authority.text, layout.port.text, layout.database.text, \
-                    layout.username.text, layout.password.text, \
-                    layout.weatherauthority.text, layout.weatherport.text, \
-                    layout.apikey.text = '', '', '', '', '', '', '', ''
+                layout.username.text, layout.password.text, \
+                layout.weatherauthority.text, layout.weatherport.text, \
+                layout.apikey.text = '', '', '', '', '', '', '', ''
                 self.canvas.ask_update()
             else:
                 layout.error.text = 'Success!'
@@ -188,39 +188,37 @@ class TravelPlannerApp(App):
 
     def update_ratings(self):
         venues = self.session.query(Venues)
-        show_venue_with_rating = ''
-        show_another_venue_with_rating = ''
-        for venue in venues:
+        rated_venue1 = ' '
+        rated_venue2 = ' '
 
+        for venue in venues:
             if venue.updated_venue_score is not None:
-                show_venue_with_rating += f'{venue.venue_name} - {venue.venue_score}\n'
-                show_another_venue_with_rating += f'{venue.venue_name} - {venue.updated_venue_score}\n'
-        self.root.get_screen('update_page').show_venue_with_rating = show_venue_with_rating
-        self.root.get_screen('update_page').show_another_venue_with_rating = show_another_venue_with_rating
+                rated_venue1 += f'{venue.venue_name} - {venue.venue_score}\n'
+                rated_venue2 += f'{venue.venue_name} - {venue.updated_venue_score}\n'
+        self.root.get_screen('update_page').show_venue_with_rating = rated_venue1
+        self.root.get_screen('update_page').show_another_venue_with_rating = rated_venue2
         self.average_score()
 
     def manage_scores(self, accepted_venues_list, rejected_venues_list):
         first_accepted_venues_list = accepted_venues_list.split(' ')
-        accepted_venues_list = []
         first_rejected_venues_list = rejected_venues_list.split(' ')
+        accepted_venues_list = []
         rejected_venues_list = []
-        for i in first_rejected_venues_list:
-            rejected_venues_list.append(i)
-        for first_venue in first_accepted_venues_list:
-            accepted_venues_list.append(first_venue)
-            print(accepted_venues_list)
+        for i in first_accepted_venues_list:
+            accepted_venues_list.append(i)
+        for j in first_rejected_venues_list:
+            rejected_venues_list.append(j)
         venues = self.session.query(Venues)
         for venue in venues:
-            for second_venue in accepted_venues_list:
+            for k in accepted_venues_list:
                 reset = None
-                if venue.venue_name == second_venue:
+                if venue.venue_name == k:
                     score = venue.updated_venue_score
-                    name = str(second_venue)
-                    ints = str(score)
-                    string = f'{venue.venue_score}'
-                    strn = f'{score}'
-                    print(string, strn, ints)
-                    self.session.query(Venues).filter(Venues.venue_name == name).update({"venue_score": ints})
+                    name = str(k)
+                    string1 = f'{venue.venue_score}'
+                    string2 = f'{score}'
+                    print(string1, string2, score)
+                    self.session.query(Venues).filter(Venues.venue_name == name).update({"venue_score": string2})
                     self.session.commit()
 
                     self.session.query(Venues).filter(Venues.venue_name == name).update(
@@ -230,23 +228,23 @@ class TravelPlannerApp(App):
                     self.average_score()
                 elif venue.venue_name in rejected_venues_list:
                     l = venue.venue_name
-                    reset1 = None
+                    reset_again = None
                     print(l)
                     self.session.query(Venues).filter(Venues.venue_name == l).update(
-                        {"updated_venue_score": reset1})
+                        {"updated_venue_score": reset_again})
                     self.session.commit()
                     print('done')
 
     def average_score(self):
         venues = self.session.query(Venues)
-        average_number = 0
-        average = ''
         count_of_venues = 0
+        average_number = 0
+        the_average = ' '
         for venue in venues:
             count_of_venues += 1
             average_number += int(venue.venue_score)
-        average += f'{average_number / count_of_venues}'
-        self.root.get_screen('update_page').average_score = average
+        the_average += f'{average_number/count_of_venues}'
+        self.root.get_screen('update_page').average_score = the_average
 
     def construct_url(self, get_parameters=None):
         resource = 'forecast'
