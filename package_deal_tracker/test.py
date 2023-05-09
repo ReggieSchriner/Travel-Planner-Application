@@ -108,4 +108,3 @@ class TestCheckForecast(TestCase):
 
         # Check if the returned forecast matches the expected forecast
         self.assertEqual(forecast, expected_forecast)
-

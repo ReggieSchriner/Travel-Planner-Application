@@ -276,7 +276,6 @@ class SubmitReview(Screen):
             popup = PackageDealTracker.create_popup(self=self)
             popup.content.bind(on_press=lambda instance: WindowManager.popup_button_pressed(popup=popup, self=self))
 
-
 class ReviewItinerary(Screen):
     pass
 

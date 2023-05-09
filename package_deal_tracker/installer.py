@@ -41,7 +41,6 @@ def add_starter_data(session):
     session.commit()
 
 
-
 def main():
     try:
         url = DealsDatabase.construct_mysql_url('localhost', 3306, 'deals_d', 'root', 'cse1208')
