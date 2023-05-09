@@ -5,7 +5,6 @@ from sqlalchemy.orm import sessionmaker, relationship
 
 Persisted = declarative_base()
 
-
 class Deals(Persisted):
     __tablename__ = 'Deals'
     deal_id = Column(Integer, primary_key=True)
