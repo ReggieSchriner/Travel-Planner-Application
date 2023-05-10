@@ -207,21 +207,21 @@ ScreenManager:
                 Label:
                     size_hint: 1, .5
                     font_size: sp(16)
-                    text: 'Amount of cities needed to be validated: 2'
+                    text: 'Amount of cities needed to be validated: '
                 Label:
                     size_hint: 1, .5
                     font_size: sp(16)
-                    text: 'Amount of airports needed to be validated: 3'
+                    text: 'Amount of airports needed to be validated: '
             BoxLayout:
                 orientation: 'vertical'
                 Label:
                     size_hint: 1, .5
                     font_size: sp(16)
-                    text: 'Amount of operators needed to be updated: 4'
+                    text: 'Amount of operators needed to be updated: '
                 Label:
                     size_hint: 1, .5
                     font_size: sp(16)
-                    text: 'Amount of venues needed to be updated: 8'
+                    text: 'Amount of venues needed to be updated: '
         BoxLayout:
             orientation: 'vertical'
             padding: 40
@@ -298,7 +298,7 @@ ScreenManager:
                 pos_hint: {'center_x': .5, 'center_y': .5}
                 text: 'Pick an airport'
                 font_size: sp(22)
-                values: ['Billy', 'Thunder', 'Cosmos']
+                values: ['', '', '']
             Label:
                 font_size: sp(22)
                 text: 'Select a city to validate:'
@@ -309,7 +309,7 @@ ScreenManager:
                 pos_hint: {'center_x': .5, 'center_y': .5}
                 text: 'Pick a city'
                 font_size: sp(22)
-                values: ['Washington', 'New York', 'Lincoln']
+                values: ['', '', '']
         BoxLayout:
             orientation: 'vertical'
             size_hint: 1, .4
