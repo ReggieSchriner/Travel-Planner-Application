@@ -137,7 +137,7 @@ class ValidateLocationsPage(Screen):
             airports_not_validated = self.session.query(Airport).filter_by(validated=False).all()
             cities_not_validated = self.session.query(City).filter_by(validated=False).all()
             self.number_of_unvalidated_locations = airports_not_validated + cities_not_validated
-            
+
     def reviews_to_examine(self):
         if self.session is not None:
             review_to_examine = self.session.query(Reviews).filter_by(accepted=False).all()
@@ -212,6 +212,10 @@ class ItineraryPage(Screen):
 
 
 class TravelPlannerApp(App):
+
+    def __init__(self, **kwargs):
+        super().__init__(kwargs)
+        self.rest_connection = None
 
     def build(self):
         inspector.create_inspector(Window, self)
