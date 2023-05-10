@@ -9,14 +9,12 @@ from kivy.modules import inspector  # For inspection
 from kivy.properties import StringProperty
 from kivy.uix.checkbox import CheckBox
 from kivy.uix.label import Label
-from kivy.uix.popup import Popup
 from kivy.uix.screenmanager import ScreenManager, Screen
 from mysql.connector import ProgrammingError
 from sqlalchemy.exc import SQLAlchemyError
-
 import rest
 from travel_planner_app import combined_installer
-from travel_planner_app.combined_database import Venues, DealsDatabase, Airport, City, Reviews
+from travel_planner_app.combined_database import Venues, Airport, City, Reviews
 
 UNL_LATITUDE = 40.8207
 UNL_LONGITUDE = -96.7005
@@ -26,6 +24,94 @@ COUNT = 5
 
 class CredentialsWindow(Screen):
     Screen.current = 'credentials'
+
+    def __init__(self, **kwargs):
+        super().__init__()
+        self.geocoding_rest_connection = None
+        self.forecast_rest_connection = None
+
+    def on_start(self):
+        self.add_credentials()
+
+    def add_credentials(self):
+        try:
+            f = open('credentials.json')
+            data = json.load(f)
+            attributes = []
+            for element in data.values():
+                attributes.append(element)
+            authority = attributes[0]
+            port = attributes[1]
+            database = attributes[2]
+            username = attributes[3]
+            password = attributes[4]
+            weatherauthority = attributes[5]
+            weatherport = attributes[6]
+            apikey = attributes[7]
+            self.root.ids.authority.text = authority
+            self.root.ids.port.text = port
+            self.root.ids.database.text = database
+            self.root.ids.username.text = username
+            self.root.ids.password.text = ''
+            self.root.ids.weatherauthority.text = weatherauthority
+            self.root.ids.weatherport.text = weatherport
+            self.root.ids.apikey.text = ''
+
+        except IndexError:
+            print('JSON file was not set up correctly.')
+
+    def submit_credentials(self):
+        running_app = App.get_running_app()
+        try:
+            layout = self.root.get_screen('credentials').ids
+            url = running_app.construct_url({"appid": f"{layout.apikey.text}", "units": "imperial"})
+            if url is None:
+                layout.message.text = 'Please enter a valid api key'
+            attributes = [layout.authority.text, layout.port.text, layout.database.text,
+                          layout.username.text, layout.password.text,
+                          layout.weatherauthority.text, layout.weatherport.text,
+                          layout.apikey.text]
+            if any(attribute.isspace() or attribute == '' for attribute in attributes):
+                layout.message.text = 'Fill in all text boxes'
+                print(layout.message.text)
+                layout.authority.text, layout.port.text, layout.database.text, \
+                    layout.username.text, layout.password.text, \
+                    layout.weatherauthority.text, layout.weatherport.text, \
+                    layout.apikey.text = '', '', '', '', '', '', '', ''
+                self.canvas.ask_update()
+            else:
+                layout.error.text = 'Success!'
+                addition = combined_installer.Credentials(authority=attributes[0], port=attributes[1],
+                                                          database=attributes[2],
+                                                          username=attributes[3], password=attributes[4],
+                                                          weatherauthority=attributes[5], weatherport=attributes[6],
+                                                          apikey=attributes[7])
+                self.forecast_rest_connection = rest.RESTConnection(layout.weatherauthority.text,
+                                                                    layout.weatherport.text, '/data/2.5',
+                                                                    layout.apikey.text)
+                self.geocoding_rest_connection = rest.RESTConnection(layout.weatherauthority.text,
+                                                                     layout.weatherport.text, '/geo/1.0',
+                                                                     layout.apikey.text)
+
+                self.forecast_rest_connection.send_request('weather', {'q': 'Lincoln'}, None, None, ConnectionError,
+                                                           ConnectionError)
+                running_app = App.get_running_app()
+                running_app.commit(addition)
+            layout.authority.text, layout.port.text, layout.database.text, \
+                layout.username.text, layout.password.text, \
+                layout.weatherauthority.text, layout.weatherport.text, \
+                layout.apikey.text = '', '', '', '', '', '', '', ''
+            print(url)
+            return url
+
+        except ValueError:
+            print('port is invalid')
+        except ProgrammingError:
+            print('Incorrect database credentials. Please try again.')
+        except SQLAlchemyError as sqlerror:
+            print('An error occurred while connecting to the database:\n' + str(sqlerror))
+        except ConnectionError:
+            print('Cannot connect to OpenWeather API. Please try again.')
 
 
 class LoadingScreen(Screen):
@@ -173,108 +259,11 @@ class ItineraryPage(Screen):
 
 
 class TravelPlannerApp(App):
-    def __init__(self, **kwargs):
-        self.manager = None
-        self.unvalidated_locations = None
-        url = DealsDatabase.construct_mysql_url('cse.unl.edu', 3306, 'zridha', 'zridha', 'q2H-sn')
-        self.combined_database = DealsDatabase(url)
-        self.session = self.combined_database.create_session()
-        super().__init__()
-        self.session = None
-        self.rest_connection = None
-        self.popup_message = Label(text='', color='black')
-        self.popup = Popup(content=self.popup_message, size=(400, 400), background='white', size_hint=(None, None))
-        self.forecast_rest_connection = None
-        self.geocoding_rest_connection = None
 
     def build(self):
         inspector.create_inspector(Window, self)
         kv = Builder.load_file("travel_planner.kv")
         return kv
-
-    def on_start(self):
-        self.add_credentials()
-
-    def add_credentials(self):
-        try:
-            f = open('credentials.json')
-            data = json.load(f)
-            attributes = []
-            for element in data.values():
-                attributes.append(element)
-            authority = attributes[0]
-            port = attributes[1]
-            database = attributes[2]
-            username = attributes[3]
-            password = attributes[4]
-            weatherauthority = attributes[5]
-            weatherport = attributes[6]
-            apikey = attributes[7]
-            # for some reason, these won't work:
-            # self.root.ids.authority.text = authority
-            # self.root.ids.port.text = port
-            # self.root.ids.database.text = database
-            # self.root.ids.username.text = username
-            # self.root.ids.password.text = ''
-            # self.root.ids.weatherauthority.text = weatherauthority
-            # self.root.ids.weatherport.text = weatherport
-            # self.root.ids.apikey.text = ''
-
-        except IndexError:
-            print('JSON file was not set up correctly.')
-
-    def submit_credentials(self):
-        running_app = App.get_running_app()
-        try:
-            layout = self.root.get_screen('credentials').ids
-            url = running_app.construct_url({"appid": f"{layout.apikey.text}", "units": "imperial"})
-            if url is None:
-                layout.message.text = 'Please enter a valid api key'
-            attributes = [layout.authority.text, layout.port.text, layout.database.text,
-                          layout.username.text, layout.password.text,
-                          layout.weatherauthority.text, layout.weatherport.text,
-                          layout.apikey.text]
-            if any(attribute.isspace() or attribute == '' for attribute in attributes):
-                layout.message.text = 'Fill in all text boxes'
-                print(layout.message.text)
-                layout.authority.text, layout.port.text, layout.database.text, \
-                layout.username.text, layout.password.text, \
-                layout.weatherauthority.text, layout.weatherport.text, \
-                layout.apikey.text = '', '', '', '', '', '', '', ''
-                self.canvas.ask_update()
-            else:
-                layout.error.text = 'Success!'
-                addition = combined_installer.Credentials(authority=attributes[0], port=attributes[1],
-                                                          database=attributes[2],
-                                                          username=attributes[3], password=attributes[4],
-                                                          weatherauthority=attributes[5], weatherport=attributes[6],
-                                                          apikey=attributes[7])
-                self.forecast_rest_connection = rest.RESTConnection(layout.weatherauthority.text,
-                                                                    layout.weatherport.text, '/data/2.5',
-                                                                    layout.apikey.text)
-                self.geocoding_rest_connection = rest.RESTConnection(layout.weatherauthority.text,
-                                                                     layout.weatherport.text, '/geo/1.0',
-                                                                     layout.apikey.text)
-
-                self.forecast_rest_connection.send_request('weather', {'q': 'Lincoln'}, None, None, ConnectionError,
-                                                           ConnectionError)
-                running_app = App.get_running_app()
-                running_app.commit(addition)
-            layout.authority.text, layout.port.text, layout.database.text, \
-            layout.username.text, layout.password.text, \
-            layout.weatherauthority.text, layout.weatherport.text, \
-            layout.apikey.text = '', '', '', '', '', '', '', ''
-            print(url)
-            return url
-
-        except ValueError:
-            print('port is invalid')
-        except ProgrammingError:
-            print('Incorrect database credentials. Please try again.')
-        except SQLAlchemyError as sqlerror:
-            print('An error occurred while connecting to the database:\n' + str(sqlerror))
-        except ConnectionError:
-            print('Cannot connect to OpenWeather API. Please try again.')
 
     def construct_url(self, get_parameters=None):
         resource = 'forecast'
