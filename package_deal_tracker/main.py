@@ -178,7 +178,6 @@ class CheckForecast(Screen):
             if forecast is not None:
                 return forecast
 
-
     def get_forecast_from_api(self, longitude, latitude, api_key):
         url = f"http://api.openweathermap.org/data/2.5/forecast?lat={latitude}&lon={longitude}&appid={api_key}&units=imperial"
         response = requests.get(url)
