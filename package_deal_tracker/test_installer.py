@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from sys import stderr
 from sqlalchemy.exc import SQLAlchemyError
 from database import Venues, DealsDatabase, Operators, Deals, Forecasts, VenueScores, OperatorScores
-from travel_planner_app import database
+import database
 
 
 def add_starter_data(session):

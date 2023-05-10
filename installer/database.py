@@ -26,7 +26,6 @@ class Venues(Persisted):
     deals = relationship("Deals", back_populates="venue")
     forecasts = relationship("Forecasts", back_populates="venue")
 
-
 class Operators(Persisted):
     __tablename__ = 'Operators'
     operator_id = Column(Integer, primary_key=True)
