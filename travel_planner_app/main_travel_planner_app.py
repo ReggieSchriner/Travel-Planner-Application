@@ -74,9 +74,9 @@ class CredentialsWindow(Screen):
                 correct_screen.message.text = 'Fill in all text boxes'
                 print(correct_screen.message.text)
                 correct_screen.authority.text, correct_screen.port.text, correct_screen.database.text, \
-                    correct_screen.username.text, correct_screen.password.text, \
-                    correct_screen.weatherauthority.text, correct_screen.weatherport.text, \
-                    correct_screen.apikey.text = '', '', '', '', '', '', '', ''
+                correct_screen.username.text, correct_screen.password.text, \
+                correct_screen.weatherauthority.text, correct_screen.weatherport.text, \
+                correct_screen.apikey.text = '', '', '', '', '', '', '', ''
                 self.canvas.ask_update()
             else:
                 correct_screen.error.text = 'Success!'
@@ -97,9 +97,9 @@ class CredentialsWindow(Screen):
                 running_app = App.get_running_app()
                 running_app.commit(addition)
             correct_screen.authority.text, correct_screen.port.text, correct_screen.database.text, \
-                correct_screen.username.text, correct_screen.password.text, \
-                correct_screen.weatherauthority.text, correct_screen.weatherport.text, \
-                correct_screen.apikey.text = '', '', '', '', '', '', '', ''
+            correct_screen.username.text, correct_screen.password.text, \
+            correct_screen.weatherauthority.text, correct_screen.weatherport.text, \
+            correct_screen.apikey.text = '', '', '', '', '', '', '', ''
             print(url)
             return url
 
@@ -130,46 +130,18 @@ class ValidateLocationsPage(Screen):
 
     def __init__(self, **kwargs):
         super().__init__()
-        self.unvalidated_locations = None
+        self.number_of_unvalidated_locations = None
 
-    def unvalidated_locations(self):
+    def locations_not_validated(self):
         if self.session is not None:
-            unvalidated_airports = self.session.query(Airport).filter_by(validated=False).all()
-            unvalidated_cities = self.session.query(City).filter_by(validated=False).all()
-            self.unvalidated_locations = unvalidated_airports + unvalidated_cities
-
+            airports_not_validated = self.session.query(Airport).filter_by(validated=False).all()
+            cities_not_validated = self.session.query(City).filter_by(validated=False).all()
+            self.number_of_unvalidated_locations = airports_not_validated + cities_not_validated
+            
     def reviews_to_examine(self):
         if self.session is not None:
             review_to_examine = self.session.query(Reviews).filter_by(accepted=False).all()
             self.session.query(Venues).filter_by(review_to_examine).all()
-        else:
-            print('There is no session')
-
-    def validate_city(self, city):
-        geo_data = {
-            'latitude': [],
-            'longitude': [],
-            'name': []
-        }
-        if len(geo_data['name']) > 0:
-            for i in range(len(geo_data['name'])):
-                if geo_data['name'][i] == city.name and self.is_location_near:
-                    city.validated = True
-        else:
-            self.session.delete(city)
-        self.session.commit()
-
-    def validate_location(self):
-        for label in self.root.get_screen('validate_page'):
-            if label.active is True:
-                airport = self.session.query(Airport).filter_by(name=label.id).first()
-                city = self.session.query(City).filter_by(name=label.id).first()
-                if city:
-                    self.unvalidated_locations.remove(city)
-                else:
-                    self.unvalidated_locations.remove(airport)
-                self.session.commit()
-                self.unvalidated_locations()
 
 
 class UpdateRatingsPage(Screen):
