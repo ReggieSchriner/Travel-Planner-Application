@@ -41,10 +41,11 @@
     running the main.py file. Then the GUI can be used to interact with and access the rest of the app. 
 
     In order to make the tests function, create a database called 'deals_test' by using the command: 'mysql 
-    --protocol=TCP --port=3306 --user=root -p' in you terminal and then typing the password. Then type 'create
+    --protocol=TCP --port=3306 --user=root -p' in your terminal and then typing your password. Then type 'create
     database deals_test' to create the database so that the unit tests can run and store information.
     Then to use the unit tests, run the test_installer.py file and then the tests.py file will function as 
-    expected. As you will see, all tests are passing and each test check the functionality of the methods that 
-    interact with the database by using a local databse to run the tests.
+    expected. As you will see, all tests are passing and each test checks the functionality of the methods that 
+    interact with the database by using a local databse to run the tests. The only functions that do not have a test
+    are the submit_score and review_itinerary methods.
 
 3. Entertainment Tracker App
