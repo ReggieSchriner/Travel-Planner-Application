@@ -75,9 +75,9 @@ class CredentialsWindow(Screen):
                 layout.message.text = 'Fill in all text boxes'
                 print(layout.message.text)
                 layout.authority.text, layout.port.text, layout.database.text, \
-                    layout.username.text, layout.password.text, \
-                    layout.weatherauthority.text, layout.weatherport.text, \
-                    layout.apikey.text = '', '', '', '', '', '', '', ''
+                layout.username.text, layout.password.text, \
+                layout.weatherauthority.text, layout.weatherport.text, \
+                layout.apikey.text = '', '', '', '', '', '', '', ''
                 self.canvas.ask_update()
             else:
                 layout.error.text = 'Success!'
@@ -98,9 +98,9 @@ class CredentialsWindow(Screen):
                 running_app = App.get_running_app()
                 running_app.commit(addition)
             layout.authority.text, layout.port.text, layout.database.text, \
-                layout.username.text, layout.password.text, \
-                layout.weatherauthority.text, layout.weatherport.text, \
-                layout.apikey.text = '', '', '', '', '', '', '', ''
+            layout.username.text, layout.password.text, \
+            layout.weatherauthority.text, layout.weatherport.text, \
+            layout.apikey.text = '', '', '', '', '', '', '', ''
             print(url)
             return url
 
@@ -138,14 +138,6 @@ class ValidateLocationsPage(Screen):
             unvalidated_airports = self.session.query(Airport).filter_by(validated=False).all()
             unvalidated_cities = self.session.query(City).filter_by(validated=False).all()
             self.unvalidated_locations = unvalidated_airports + unvalidated_cities
-            layout = self.root.get_screen('validate_page').ids
-            if len(self.unvalidated_locations) > 0:
-                for unvalidated_locations in self.unvalidated_locations:
-                    checkbox = CheckBox(size_hint_y=None, height=48, group='unvalidated_location_checkboxes')
-                    checkbox.id = unvalidated_locations.name
-                    label = Label(text=unvalidated_locations.name, color=[0, 0, 0, 1], size_hint_y=None)
-                    layout.add_widget(label)
-                    layout.add_widget(checkbox)
 
     def reviews_to_examine(self):
         if self.session is not None:
@@ -168,19 +160,17 @@ class ValidateLocationsPage(Screen):
             self.session.delete(city)
         self.session.commit()
 
-    # def validate_airport is not complete
     def validate_location(self):
-        for widget in self.root.get_screen('validate_page').ids.children:
-            if isinstance(widget, CheckBox):
-                if widget.active is True:
-                    airport = self.session.query(Airport).filter_by(name=widget.id).first()
-                    city = self.session.query(City).filter_by(name=widget.id).first()
-                    if city:
-                        self.unvalidated_locations.remove(city)
-                    else:
-                        self.unvalidated_locations.remove(airport)
-                    self.session.commit()
-                    self.unvalidated_locations()
+        for label in self.root.get_screen('validate_page'):
+            if label.active is True:
+                airport = self.session.query(Airport).filter_by(name=label.id).first()
+                city = self.session.query(City).filter_by(name=label.id).first()
+                if city:
+                    self.unvalidated_locations.remove(city)
+                else:
+                    self.unvalidated_locations.remove(airport)
+                self.session.commit()
+                self.unvalidated_locations()
 
 
 class UpdateRatingsPage(Screen):
@@ -191,62 +181,58 @@ class UpdateRatingsPage(Screen):
 
     def update_ratings(self):
         venues = self.session.query(Venues)
-        rated_venue1 = ' '
-        rated_venue2 = ' '
+        venue1 = ' '
+        venue2 = ' '
         number_of_venues = 0
         average_number = 0
-        the_average = ' '
-        accepted_venues_list = []
-        rejected_venues_list = []
-        for venue in venues:
-            number_of_venues += 1
-            average_number += int(venue.venue_score)
-        the_average += f'{average_number / number_of_venues}'
-        self.root.get_screen('update_page').average_score = the_average
+        average_score = ' '
+        accepted_venues = []
+        rejected_venues = []
+        clear = None
 
         for venue in venues:
             if venue.updated_venue_score is not None:
-                rated_venue1 += f'{venue.venue_name} gets a score of {venue.venue_score}\n'
-                rated_venue2 += f'{venue.venue_name} gets a score of {venue.updated_venue_score}\n'
-        self.root.get_screen('update_page').show_venue_with_rating = rated_venue1
-        self.root.get_screen('update_page').show_another_venue_with_rating = rated_venue2
+                venue1 += f'{venue.venue_name} gets a score of {venue.venue_score}\n'
+                venue2 += f'{venue.venue_name} gets a score of {venue.updated_venue_score}\n'
+        self.root.get_screen('update_page').show_venue_with_rating = venue1
+        self.root.get_screen('update_page').show_another_venue_with_rating = venue2
         self.average_score()
 
-        first_accepted_venues_list = accepted_venues_list.split(' ')
-        first_rejected_venues_list = rejected_venues_list.split(' ')
-
-        for i in first_accepted_venues_list:
-            accepted_venues_list.append(i)
-        for j in first_rejected_venues_list:
-            rejected_venues_list.append(j)
-        venues = self.session.query(Venues)
         for venue in venues:
-            for k in accepted_venues_list:
-                reset = None
+            number_of_venues += 1
+            average_number += int(venue.venue_score)
+        average_score += f'{average_number / number_of_venues}'
+        self.root.get_screen('update_page').average_score = average_score
+
+        split_accepted_venues = accepted_venues.split(' ')
+        split_rejected_venues = rejected_venues.split(' ')
+
+        for value in split_accepted_venues:
+            accepted_venues.append(value)
+        for variable in split_rejected_venues:
+            rejected_venues.append(variable)
+
+        for venue in venues:
+            for k in accepted_venues:
                 if venue.venue_name == k:
                     score = venue.updated_venue_score
                     name = str(k)
-                    string1 = f'{venue.venue_score}'
-                    string2 = f'{score}'
-                    print(string1, string2, score)
-                    self.session.query(Venues).filter(Venues.venue_name == name).update({"venue_score": string2})
+                    score_string = f'{score}'
+                    self.session.query(Venues).filter(Venues.venue_name == name).update({"venue_score": score_string})
                     self.session.commit()
 
                     self.session.query(Venues).filter(Venues.venue_name == name).update(
-                        {"updated_venue_score": reset})
+                        {"updated_venue_score": clear})
                     self.session.commit()
-                    print('The venues have been accepted!')
-                elif venue.venue_name in rejected_venues_list:
-                    l = venue.venue_name
-                    reset_again = None
-                    print(l)
-                    self.session.query(Venues).filter(Venues.venue_name == l).update(
-                        {"updated_venue_score": reset_again})
+                    print('The venues have been submitted')
+                elif venue.venue_name in rejected_venues:
+                    venue_name = venue.venue_name
+                    self.session.query(Venues).filter(Venues.venue_name == venue_name).update(
+                        {"updated_venue_score": clear})
                     self.session.commit()
-                    print('done')
 
 
-class ScreenManager(ScreenManager):
+class WindowManager(ScreenManager):
     pass
 
 
