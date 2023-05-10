@@ -395,6 +395,20 @@ ScreenManager:
                     on_text_validate: password.focus = True
                     size_hint: (0.6, 0.40)
                 Label:
+                    size_hint: (0.6, 0.8)
+                Label:
+                    text: 'Name of the venue to reject the score of:'
+                    pos_hint: {'center_x': .5, 'center_y': .5}
+                    size_hint: (0.50, 0.25)
+                    font_size: sp(18)
+                TextInput:
+                    id: rejected_venues
+                    multiline: False
+                    write_tab: False
+                    pos_hint: {'center_x': .5, 'center_y': .5}
+                    on_text_validate: password.focus = True
+                    size_hint: (0.6, 0.8)
+                Label:
                     text: 'the average score is: '
                     pos_hint: {'center_x': .5, 'center_y': .5}
                     id: show_yet_another_venue_score
@@ -468,3 +482,4 @@ ScreenManager:
                 text: 'Back to Main Menu'
                 font_size: sp(22)
                 on_release: app.root.current = 'main_menu'
+

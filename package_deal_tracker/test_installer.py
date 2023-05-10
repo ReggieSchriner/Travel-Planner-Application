@@ -1,8 +1,8 @@
-import json
 from datetime import datetime, timedelta
 from sys import stderr
 from sqlalchemy.exc import SQLAlchemyError
 from database import Venues, DealsDatabase, Operators, Deals, Forecasts, VenueScores, OperatorScores
+import database
 
 
 def add_starter_data(session):
@@ -60,20 +60,10 @@ def add_starter_data(session):
     session.commit()
 
 
+# Set up database
 def main():
     try:
-        f = open('credentials.json')
-        data = json.load(f)
-        attributes = []
-        for element in data.values():
-            attributes.append(element)
-        authority = attributes[0]
-        port = attributes[1]
-        database = attributes[2]
-        username = attributes[3]
-        password = attributes[4]
-        url = DealsDatabase.construct_mysql_url(authority=authority, port=port, database=database, username=username,
-                                                password=password)
+        url = database.DealsDatabase.construct_mysql_url('localhost', 3306, 'deals_test', 'root', 'cse1208')
         package_deal_database = DealsDatabase(url)
         package_deal_database.drop_all_tables()
         package_deal_database.ensure_tables_exist()
