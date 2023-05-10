@@ -162,13 +162,9 @@ class ValidateLocationsPage(Screen):
         }
         if len(geo_data['name']) > 0:
             for i in range(len(geo_data['name'])):
-                if geo_data['name'][i] == city.name and self.is_location_near(geo_data['latitude'][i],
-                                                                              geo_data['longitude'][i], city.latitude,
-                                                                              city.longitude):
+                if geo_data['name'][i] == city.name and self.is_location_near:
                     city.validated = True
-                    self.popup_message.text = 'City successfully validated'
         else:
-            print('City has been deleted')
             self.session.delete(city)
         self.session.commit()
 
