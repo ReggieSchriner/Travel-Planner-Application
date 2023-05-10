@@ -7,11 +7,10 @@ from kivy.core.window import Window  # For inspection
 from kivy.lang import Builder
 from kivy.modules import inspector  # For inspection
 from kivy.properties import StringProperty
-from kivy.uix.checkbox import CheckBox
-from kivy.uix.label import Label
 from kivy.uix.screenmanager import ScreenManager, Screen
 from mysql.connector import ProgrammingError
 from sqlalchemy.exc import SQLAlchemyError
+
 import rest
 from travel_planner_app import combined_installer
 from travel_planner_app.combined_database import Venues, Airport, City, Reviews
@@ -63,44 +62,44 @@ class CredentialsWindow(Screen):
     def submit_credentials(self):
         running_app = App.get_running_app()
         try:
-            layout = self.root.get_screen('credentials').ids
-            url = running_app.construct_url({"appid": f"{layout.apikey.text}", "units": "imperial"})
+            correct_screen = self.root.get_screen('credentials').ids
+            url = running_app.construct_url({"appid": f"{correct_screen.apikey.text}", "units": "imperial"})
             if url is None:
-                layout.message.text = 'Please enter a valid api key'
-            attributes = [layout.authority.text, layout.port.text, layout.database.text,
-                          layout.username.text, layout.password.text,
-                          layout.weatherauthority.text, layout.weatherport.text,
-                          layout.apikey.text]
+                correct_screen.message.text = 'Please enter a valid api key'
+            attributes = [correct_screen.authority.text, correct_screen.port.text, correct_screen.database.text,
+                          correct_screen.username.text, correct_screen.password.text,
+                          correct_screen.weatherauthority.text, correct_screen.weatherport.text,
+                          correct_screen.apikey.text]
             if any(attribute.isspace() or attribute == '' for attribute in attributes):
-                layout.message.text = 'Fill in all text boxes'
-                print(layout.message.text)
-                layout.authority.text, layout.port.text, layout.database.text, \
-                layout.username.text, layout.password.text, \
-                layout.weatherauthority.text, layout.weatherport.text, \
-                layout.apikey.text = '', '', '', '', '', '', '', ''
+                correct_screen.message.text = 'Fill in all text boxes'
+                print(correct_screen.message.text)
+                correct_screen.authority.text, correct_screen.port.text, correct_screen.database.text, \
+                    correct_screen.username.text, correct_screen.password.text, \
+                    correct_screen.weatherauthority.text, correct_screen.weatherport.text, \
+                    correct_screen.apikey.text = '', '', '', '', '', '', '', ''
                 self.canvas.ask_update()
             else:
-                layout.error.text = 'Success!'
+                correct_screen.error.text = 'Success!'
                 addition = combined_installer.Credentials(authority=attributes[0], port=attributes[1],
                                                           database=attributes[2],
                                                           username=attributes[3], password=attributes[4],
                                                           weatherauthority=attributes[5], weatherport=attributes[6],
                                                           apikey=attributes[7])
-                self.forecast_rest_connection = rest.RESTConnection(layout.weatherauthority.text,
-                                                                    layout.weatherport.text, '/data/2.5',
-                                                                    layout.apikey.text)
-                self.geocoding_rest_connection = rest.RESTConnection(layout.weatherauthority.text,
-                                                                     layout.weatherport.text, '/geo/1.0',
-                                                                     layout.apikey.text)
+                self.forecast_rest_connection = rest.RESTConnection(correct_screen.weatherauthority.text,
+                                                                    correct_screen.weatherport.text, '/data/2.5',
+                                                                    correct_screen.apikey.text)
+                self.geocoding_rest_connection = rest.RESTConnection(correct_screen.weatherauthority.text,
+                                                                     correct_screen.weatherport.text, '/geo/1.0',
+                                                                     correct_screen.apikey.text)
 
                 self.forecast_rest_connection.send_request('weather', {'q': 'Lincoln'}, None, None, ConnectionError,
                                                            ConnectionError)
                 running_app = App.get_running_app()
                 running_app.commit(addition)
-            layout.authority.text, layout.port.text, layout.database.text, \
-            layout.username.text, layout.password.text, \
-            layout.weatherauthority.text, layout.weatherport.text, \
-            layout.apikey.text = '', '', '', '', '', '', '', ''
+            correct_screen.authority.text, correct_screen.port.text, correct_screen.database.text, \
+                correct_screen.username.text, correct_screen.password.text, \
+                correct_screen.weatherauthority.text, correct_screen.weatherport.text, \
+                correct_screen.apikey.text = '', '', '', '', '', '', '', ''
             print(url)
             return url
 
