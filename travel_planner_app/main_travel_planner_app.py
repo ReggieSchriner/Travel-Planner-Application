@@ -13,6 +13,7 @@ from kivy.uix.popup import Popup
 from kivy.uix.screenmanager import ScreenManager, Screen
 from lazr.restfulclient.errors import HTTPError
 from mysql.connector import OperationalError, ProgrammingError
+from self import self
 from sqlalchemy.exc import SQLAlchemyError, NoResultFound, MultipleResultsFound
 
 import rest
@@ -80,112 +81,6 @@ class TravelPlannerApp(App):
         inspector.create_inspector(Window, self)
         kv = Builder.load_file("travel_planner.kv")
         return kv
-
-    def on_start(self):
-        self.add_credentials()
-
-    def add_credentials(self):
-        try:
-            f = open('credentials.json')
-            data = json.load(f)
-            attributes = []
-            for element in data.values():
-                attributes.append(element)
-            authority = attributes[0]
-            port = attributes[1]
-            database = attributes[2]
-            username = attributes[3]
-            password = attributes[4]
-            weatherauthority = attributes[5]
-            weatherport = attributes[6]
-            apikey = attributes[7]
-            # self.root.ids.authority.text = authority
-            # self.root.ids.port.text = port
-            # self.root.ids.database.text = database
-            # self.root.ids.username.text = username
-            # self.root.ids.password.text = ''
-            # self.root.ids.weatherauthority.text = weatherauthority
-            # self.root.ids.weatherport.text = weatherport
-            # self.root.ids.apikey.text = ''
-
-        except FileNotFoundError:
-            self.popup_message.text = 'The credentials json was not found in root directory'
-            self.popup.open()
-        except KeyError:
-            self.popup_message.text = 'The field you called in json does not exist.\nCheck the readme for correct documentation'
-            self.popup.open()
-        except IndexError:
-            self.popup_message.text = 'JSON file was not set up correctly. \nCheck the readme for correct documentation'
-
-    def submit_credentials(self):
-        # self.manager.current = 'main_menu'
-        running_app = App.get_running_app()
-        try:
-            layout = self.root.get_screen('credentials').ids
-            url = running_app.construct_url({"appid": f"{layout.apikey.text}", "units": "imperial"})
-            if url is None:
-                layout.message.text = 'Please enter a valid api key'
-            attributes = [layout.authority.text, layout.port.text, layout.database.text,
-                          layout.username.text, layout.password.text,
-                          layout.weatherauthority.text, layout.weatherport.text,
-                          layout.apikey.text]
-            if any(attribute.isspace() or attribute == '' for attribute in attributes):
-                layout.message.text = 'Fill in all text boxes'
-                print(layout.message.text)
-                layout.authority.text, layout.port.text, layout.database.text, \
-                    layout.username.text, layout.password.text, \
-                    layout.weatherauthority.text, layout.weatherport.text, \
-                    layout.apikey.text = '', '', '', '', '', '', '', ''
-                self.canvas.ask_update()
-            else:
-                layout.error.text = 'Success!'
-                addition = combined_installer.Credentials(authority=attributes[0], port=attributes[1],
-                                                          database=attributes[2],
-                                                          username=attributes[3], password=attributes[4],
-                                                          weatherauthority=attributes[5], weatherport=attributes[6],
-                                                          apikey=attributes[7])
-                self.forecast_rest_connection = rest.RESTConnection(layout.weatherauthority.text,
-                                                                    layout.weatherport.text, '/data/2.5',
-                                                                    layout.apikey.text)
-                self.geocoding_rest_connection = rest.RESTConnection(layout.weatherauthority.text,
-                                                                     layout.weatherport.text, '/geo/1.0',
-                                                                     layout.apikey.text)
-
-                self.forecast_rest_connection.send_request('weather', {'q': 'Lincoln'}, None, None, ConnectionError,
-                                                           ConnectionError)
-                running_app = App.get_running_app()
-                running_app.commit(addition)
-            layout.authority.text, layout.port.text, layout.database.text, \
-            layout.username.text, layout.password.text, \
-            layout.weatherauthority.text, layout.weatherport.text, \
-            layout.apikey.text = '', '', '', '', '', '', '', ''
-            print(url)
-            return url
-
-        except ValueError:
-            self.popup_message.text = 'port is invalid'
-            self.popup.open()
-        except OperationalError:
-            print('operation error')
-            self.popup_message.text = 'Unable to establish a connection to the database. Please try again.'
-            self.popup.open()
-        except ProgrammingError:
-            print('programming error')
-            self.popup_message.text = 'Incorrect database credentials. Please try again.'
-            self.popup.open()
-        except SQLAlchemyError as sqlerror:
-            self.popup_message.text = 'An error occurred while connecting to the database:\n' + str(sqlerror)
-            self.popup.open()
-        except ConnectionError:
-            self.popup_message.text = 'Cannot connect to OpenWeather API. Please try again.'
-            self.popup.open()
-        except HTTPError as error:
-            if error.response.status_code == 401:
-                self.popup_message.text = 'Invalid API key'
-                self.popup.open()
-            else:
-                self.popup_message.text = 'Error connecting to OpenWeather API'
-                self.popup.open()
 
     # def unvalidated_locations(self):
     #     if self.session is not None:
@@ -389,5 +284,4 @@ class TravelPlannerApp(App):
 
 if __name__ == '__main__':
     app = TravelPlannerApp()
-    app.add_credentials()
     app.run()
