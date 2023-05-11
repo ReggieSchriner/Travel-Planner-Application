@@ -14,9 +14,9 @@
 
 1. Travel Planner App - The app is functional but is still incomplete and has bugs. While there was error handling put into place, it isn't showing up or working due to a kivy issue. There is code for updating reviews and for the validate locations page but whether they work or not is hard to determine because of the kivy issue. The itinerary screen also does not have functionality and there are no tests.
 
-2. Package Deal Tracker App - The app is almost mostly functional, only missing the review itinerary screen, with no known bugs. The app works perfectly with the database and add/pull information as expected. The only part of the functionality that needs to be added is the review itinerary screen. Furthermore, the app has multiple test cases that test the use of the database, all of which pass. The only methods that do not have tests are the submit_score and review_itinerary methods. 
+2. Package Deal Tracker App - The app is almost mostly functional, only missing the review itinerary screen, with no known bugs. The app works perfectly with the database and add/pull information as expected. The only part of the functionality that needs to be added is the review itinerary screen. Furthermore, the app has multiple test cases that test the use of the database, all of which pass. The only methods that do not have tests are the submit_score and review_itinerary methods. The test coverage can be found in the htmlcov folder inside the package_deal_tracker folder.
 
-3. Entertainment Tracker App - The app is half functional and is not even connected to the database, nor is it updated or tested.
+3. Entertainment Tracker App - The app is half functional and is not connected to the database, nor is it updated or tested.
 
 ## Instructions for running each app
 
