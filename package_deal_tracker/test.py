@@ -1,16 +1,12 @@
-from datetime import datetime
-from unittest import TestCase
+import unittest
 
-from kivy.uix.spinner import Spinner, SpinnerOption
-from requests import patch
-
-from package_deal_tracker.database import Venues, DealsDatabase, Operators, Forecasts, OperatorScores, VenueScores, \
-    Deals
-from package_deal_tracker.main import NewVenue, AddEditOperator, EditOperator, CheckForecast, SubmitReview
 from kivy.app import App
 
+from database import Venues, DealsDatabase, Operators, Forecasts
+from main import NewVenue, AddEditOperator, CheckForecast
 
-class TestAddVenue(TestCase):
+
+class TestAddVenue(unittest.TestCase):
     def setUp(self):
         url = DealsDatabase.construct_mysql_url('localhost', 3306, 'deals_test', 'root', 'cse1208')
         self.deals_database = DealsDatabase(url)
@@ -30,7 +26,7 @@ class TestAddVenue(TestCase):
         self.assertEqual(added_venue.score, 10)
 
 
-class TestAddEditOperator(TestCase):
+class TestAddEditOperator(unittest.TestCase):
     def setUp(self):
         url = DealsDatabase.construct_mysql_url('localhost', 3306, 'deals_test', 'root', 'cse1208')
         self.deals_database = DealsDatabase(url)
@@ -47,7 +43,7 @@ class TestAddEditOperator(TestCase):
         self.assertEqual(added_operator.rate_my_pilot_score, 5)
 
 
-class TestCheckForecast(TestCase):
+class TestCheckForecast(unittest.TestCase):
     def setUp(self):
         # Set up the App instance
         url = DealsDatabase.construct_mysql_url('localhost', 3306, 'deals_test', 'root', 'cse1208')
